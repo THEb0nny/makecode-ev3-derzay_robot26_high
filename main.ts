@@ -7,7 +7,7 @@ sensors.setNxtLightSensorsAsLineSensors(sensors.nxtLight2, sensors.nxtLight3); /
 sensors.setLineSensorsRawRefValues(2408, 1700, 2592, 1964); // Установка калибровочных значений отражения для нормализации отражения
 
 motions.setDistRollingAfterIntersection(60); // Установка расстояния прокатки после опредления перекрёстка при движении по линии
-motions.setMinPwrAtEndMovement(40); // Установка минимальной скорости при завершении движений
+motions.setMinPwrAtEndMovement(30); // Установка минимальной скорости при завершении движений
 
 motions.setLineFollowLoopDt(1); // Установить время регулирования движения по линии
 
@@ -97,7 +97,7 @@ navigation.buildGraph([
     { from: 21, to: 20, direction: NavDirection.Up, weight: 1 },
 
     { from: 20, to: 22, direction: NavDirection.Left, weight: 1 },
-    { from: 22, to: 10, direction: NavDirection.Right, weight: 1 },
+    { from: 22, to: 22, direction: NavDirection.Right, weight: 1 },
 
     { from: 22, to: 23, direction: NavDirection.Down, weight: 1 },
     { from: 23, to: 22, direction: NavDirection.Up, weight: 1 },
@@ -109,7 +109,7 @@ navigation.buildGraph([
     { from: 25, to: 24, direction: NavDirection.Up, weight: 1 },
 
     { from: 24, to: 26, direction: NavDirection.Left, weight: 1 },
-    { from: 26, to: 24, direction: NavDirection.Up, weight: 1 },
+    { from: 26, to: 24, direction: NavDirection.Right, weight: 1 },
 
     { from: 26, to: 27, direction: NavDirection.Right, weight: 1 },
     { from: 27, to: 26, direction: NavDirection.Left, weight: 1 },
