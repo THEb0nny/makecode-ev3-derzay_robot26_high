@@ -57,7 +57,7 @@ function CheckColor(time: number, debug: boolean): number {
         prevTime = currTime;
         const color = GetColor(debug);
         colorSamples.push(color);
-        control.pauseUntilTime(currTime, 10);
+        control.pauseUntilTimeMs(currTime, 10);
     }
     const colorResult = custom.mostFrequentNumber(colorSamples);
     return colorResult;

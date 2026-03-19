@@ -4,7 +4,7 @@ chassis.setWheelDiametr(62.4); // Установка диаметра колёс
 chassis.setBaseLength(180); // Установка расстония между центрами колёс
 
 sensors.setNxtLightSensorsAsLineSensors(sensors.nxtLight2, sensors.nxtLight3); // Установка датчиков отражения в качестве датчиков линии
-sensors.setLineSensorsRawRefValues(2408, 1700, 2592, 1964); // Установка калибровочных значений отражения для нормализации отражения
+sensors.setLineSensorsRawRefValues(2076, 1328, 2360, 1612); // Установка калибровочных значений отражения для нормализации отражения
 
 motions.setDistRollingAfterIntersection(60); // Установка расстояния прокатки после опредления перекрёстка при движении по линии
 motions.setMinPwrAtEndMovement(30); // Установка минимальной скорости при завершении движений
@@ -65,6 +65,7 @@ navigation.buildGraph([
 
 
 let colors: number[] = []; // Массив, чтобы сохранить цвета кубиков
+let path: number[] = [];
 
 // Функция для одного ряда кубиков
 function CubeRow(firstCube: number, secondCube: number) {
@@ -103,8 +104,8 @@ function Main() {
     sensors.preparationLineSensor();
     manipulatorMotor.setInverted(true); // Включить реверс мотора манипулятора
     unloadingMechanismMotor.setInverted(true); // Включить реверс мотора механизма сброса
-    // Manipulator(ManipulatorState.Down, true, 40); // Предустановить манипулятор в положение раскрытия
-    // UnloadingMechanism(UnloadingMechanismState.Up, true, 10); // Предустановить механизм сброса в положение закрыт
+    Manipulator(ManipulatorState.Down, true, 40); // Предустановить манипулятор в положение раскрытия
+    UnloadingMechanism(UnloadingMechanismState.Up, true, 10); // Предустановить механизм сброса в положение закрыт
     brick.printString("RUN", 7, 13);
     brick.buttonEnter.pauseUntil(ButtonEvent.Pressed); // Ожидание нажатие кнопки
     brick.clearScreen(); // Очистить экран
@@ -121,11 +122,14 @@ function Main() {
 
     navigation.setCurrentPosition(0);
     navigation.setCurrentDirection(0);
-    let path = navigation.algorithmDFS(0, 9);
+    let path = navigation.algorithmDFS(0, 8);
     console.log(`path: ${path.join(', ')}`);
-    // chassis.accelStartLinearDistMove(30, 80, 100, 100); // Плавный старт с стартовой зоны
-    navigation.followLineByPath(path, AfterLineMotion.HoldStop, { moveStartV: 30, moveMaxV: 70, turnV: 80, accelStartDist: 50, Kp: 0.1, Kd: 0.5 }, true);
-    // navigation.directionSpinTurn(0, 60, true);
+    chassis.accelStartLinearDistMove(30, 80, 100, 100); // Плавный старт с стартовой зоны
+    navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { moveStartV: 30, moveMaxV: 70, turnV: 70, accelStartDist: 50, Kp: 0.1, Kd: 0.5 }, true);
+    navigation.directionSpinTurn(0, 70);
+    motions.rampLineFollowToDistanceByTwoSensors(170, 50, 70, MotionBraking.Hold, { vStart: 30, vMax: 60, vFinish: 20, Kp: 0.3, Kd: 0.5 }); // Подъезжаем плавно к 1 кубику
+    CubeRow(0, 1); // Захватываем первый ряд кубиков (1 и 2 кубики)
+    // pause(100);
     
     // for (let i = 0; i < 3; i++) {  // Движемся по линии и проходим три перекрёстка без остановки
     //     motions.lineFollowToCrossIntersection(AfterLineMotion.LineContinueRoll, { v: 80, Kp: 0.2, Kd: 0.5 });
