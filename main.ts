@@ -83,9 +83,9 @@ function Cube1Row(cube: number) {
 function CubeCapture(cubeNumber: number, v: number = 50) {
     Manipulator(ManipulatorState.Up, true, v); // Манипулятор поднять для захвата N-го кубика
     const color = CheckColor(300, false); // Запрашиваем и цвет
-    colors.push(color); // Сохраняем цвет в массив
-    brick.printValue(`color${cubeNumber + 1}`, colors[cubeNumber], cubeNumber + 1); // Выводим на экран цвет N-го кубика
-    VoiceColor(colors[cubeNumber]); // Озвучиваем цвет N-го кубика
+    cubeColors.push(color); // Сохраняем цвет в массив
+    brick.printValue(`cubeColors${cubeNumber + 1}`, cubeColors[cubeNumber], cubeNumber + 1); // Выводим на экран цвет N-го кубика
+    VoiceColor(cubeColors[cubeNumber]); // Озвучиваем цвет N-го кубика
     Manipulator(ManipulatorState.Down, true, 60); // Отпускаем манипулятор после определения цвета кубика
 }
 
@@ -99,13 +99,36 @@ function CubeCapture(cubeNumber: number, v: number = 50) {
 //     pause(50);
 // }
 
-let colors: number[] = []; // Массив, чтобы сохранить цвета кубиков
+let cubeColors: number[] = []; // Массив, чтобы сохранить цвета кубиков
 
 let path: number[] = []; // Переменная для хранения пути
 
 const redZoneCross: number[] = [1, 24]; // Переменная для хранения перекрёстков с красной зоной
 const greenZoneCross: number[] = [3, 22]; // Переменная для хранения перекрёстков с зелёной зоной
 const blueZoneCross: number[] = [5, 20]; // Переменная для хранения перекрёстков с синей зоной
+
+
+let btnLeftEventDone = false; // Переменная-флаг выполнения события нажатия на левую кнопку
+let btnRightEventDone = false; // Переменная-флаг выполнения события нажатия на правую кнопку
+
+// Событие нажатия на левую кнопку
+brick.buttonLeft.onEvent(ButtonEvent.Pressed, function() {
+    if (btnLeftEventDone) return;
+    btnLeftEventDone = true;
+    
+    // Чтобы найти мин и макс датчика цвета
+    brick.buttonEnter.pauseUntil(ButtonEvent.Released);
+    sensors.searchRgbMinMax(colorSensor);
+});
+
+// Событие нажатия на правую кнопку
+brick.buttonRight.onEvent(ButtonEvent.Pressed, function() {
+    if (btnRightEventDone) return;
+    // btnRightEventDone = true;
+    
+    CheckColor(1000, true); // Цвета для проверки
+});
+
 
 // Главная функция решения задачи
 function Main() {
@@ -169,7 +192,7 @@ function Main() {
     navigation.setCurrentPosition(12);
     navigation.setCurrentDirection(2);
 
-    if (colors[0] == 2) {
+    if (cubeColors[0] == 2) {
         let tempPath: number[][] = [];
         for (let i = 0; i < 2; i++) {
             tempPath[i] = navigation.algorithmDFS(navigation.getCurrentPosition(), blueZoneCross[i]);
@@ -180,7 +203,7 @@ function Main() {
         } else {
             path = tempPath[1];
         }
-    } else if (colors[0] == 3) {
+    } else if (cubeColors[0] == 3) {
         let tempPath: number[][] = [];
         for (let i = 0; i < 2; i++) {
             tempPath[i] = navigation.algorithmDFS(navigation.getCurrentPosition(), greenZoneCross[i]);
@@ -191,7 +214,7 @@ function Main() {
         } else {
             path = tempPath[1];
         }
-    } else if (colors[0] == 5) {
+    } else if (cubeColors[0] == 5) {
         let tempPath: number[][] = [];
         for (let i = 0; i < 2; i++) {
             tempPath[i] = navigation.algorithmDFS(navigation.getCurrentPosition(), redZoneCross[i]);
