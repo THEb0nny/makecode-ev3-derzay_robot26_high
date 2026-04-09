@@ -140,9 +140,8 @@ brick.buttonRight.onEvent(ButtonEvent.Pressed, function() {
 
 // Главная функция решения задачи
 function Main() {
+    sensors.preparationLineSensor(); // Опрос датчиков цвет
     for (let i = 0; i < 10; i++) { // Опрос датчиков, чтобы те включились
-        sensors.getNormalizedReflectionValue(LineSensor.Left);
-        sensors.getNormalizedReflectionValue(LineSensor.Right);
         colorSensor.rgbRaw();
         pause(5);
     }
@@ -150,6 +149,8 @@ function Main() {
     unloadingMechanismMotor.setInverted(true); // Включить реверс мотора механизма сброса
     Manipulator(ManipulatorState.Down, true, 40); // Предустановить манипулятор в положение раскрытия
     UnloadingMechanism(UnloadingMechanismState.Up, true, 10); // Предустановить механизм сброса в положение закрыт
+
+    brick.setStatusLight(StatusLight.GreenPulse); // Сигнал о готовности светодиодами
     brick.printString("RUN", 7, 13);
     brick.buttonEnter.pauseUntil(ButtonEvent.Pressed); // Ожидание нажатие кнопки
     btnLeftEventDone = true; // Выключить обработчик левой кнопки
