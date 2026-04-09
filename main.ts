@@ -4,7 +4,7 @@ chassis.setWheelDiametr(62.4); // Установка диаметра колёс
 chassis.setBaseLength(180); // Установка расстония между центрами колёс
 chassis.setBrakeSettleTime(150); // Время для стабилизации после торможения
 
-sensors.setNxtLightSensorsAsLineSensors(sensors.nxtLight2, sensors.nxtLight3); // Установка датчиков отражения в качестве датчиков линии
+sensors.setNxtLightSensorsAsLineSensors(sensors.nxtLight1, sensors.nxtLight4); // Установка датчиков отражения в качестве датчиков линии
 sensors.setLineSensorsRawRefValues(2068, 1388, 2380, 1664); // Установка калибровочных значений отражения для нормализации отражения
 
 motions.setDistRollingAfterIntersection(60); // Установка расстояния прокатки после опредления перекрёстка при движении по линии
