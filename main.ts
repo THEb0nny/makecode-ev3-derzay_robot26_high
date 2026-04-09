@@ -123,10 +123,18 @@ brick.buttonLeft.onEvent(ButtonEvent.Pressed, function() {
 
 // Событие нажатия на правую кнопку
 brick.buttonRight.onEvent(ButtonEvent.Pressed, function() {
-    if (btnRightEventDone) return;
-    // btnRightEventDone = true;
-    
-    CheckColor(1000, true); // Цвета для проверки
+    if (btnRightEventDone) return; // Отключаем обработчик
+    // btnRightEventDone = true; // Переставляе флаг, чтобы событие больше не работало
+    for (let i = 0; i < 10; i++) { // Предварительно перевести датчик цвета в режим цвета
+        colorSensor.rgbRaw();
+        pause(10);
+    }
+    brick.clearScreen();
+    let color = CheckColor(1000, true);
+    brick.clearScreen();
+    brick.printValue("color", color, 1);
+    VoiceColor(color);
+    pause(1000);
 });
 
 
