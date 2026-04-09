@@ -24,7 +24,7 @@ sensors.setHsvlToColorNumBoundaries(colorSensor, {
     whiteBoundary: -1, // V
     blackBoundary: -1, // V
     redBoundary: 98, // H
-    orangeBoundary: -1,
+    orangeBoundary: -1, // H
     brownBoundary: -1, // H
     yellowBoundary: 100, // H
     greenBoundary: 210, // H
@@ -144,6 +144,8 @@ function Main() {
     UnloadingMechanism(UnloadingMechanismState.Up, true, 10); // Предустановить механизм сброса в положение закрыт
     brick.printString("RUN", 7, 13);
     brick.buttonEnter.pauseUntil(ButtonEvent.Pressed); // Ожидание нажатие кнопки
+    btnLeftEventDone = true; // Выключить обработчик левой кнопки
+    btnRightEventDone = true; // Выключить обработчик правой кнопки
     brick.clearScreen(); // Очистить экран
 
     // Чтобы найти мин и макс датчика цвета
