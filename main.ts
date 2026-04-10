@@ -126,7 +126,7 @@ const blueZoneCross: number[] = [5, 20, 12]; // Переменная для хр
 // let btnLeftEventDone = false; // Переменная-флаг выполнения события нажатия на левую кнопку
 let btnRightEventDone = false; // Переменная-флаг выполнения события нажатия на правую кнопку
 
-// Событие нажатия на левую кнопку
+// // Событие нажатия на левую кнопку
 // brick.buttonLeft.onEvent(ButtonEvent.Pressed, function () {
 //     if (btnLeftEventDone) return;
 //     btnLeftEventDone = true;
