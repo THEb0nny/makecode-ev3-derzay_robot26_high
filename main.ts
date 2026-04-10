@@ -97,7 +97,7 @@ function Cube1Row(cube: number) {
 // Функция захвата и определение одного кубика
 function CubeCapture(cubeNumber: number, v: number = 50) {
     Manipulator(ManipulatorState.Up, true, v); // Манипулятор поднять для захвата N-го кубика
-    cubeColors.push(CheckColor(300, false)); // Запрашивают и сохраняем цвет в массив
+    cubeColors.push(CheckHtColor(300, false)); // Запрашивают и сохраняем цвет в массив
     brick.printValue(`cubeColors${cubeNumber + 1}`, cubeColors[cubeNumber], cubeNumber + 1); // Выводим на экран цвет N-го кубика
     VoiceColor(cubeColors[cubeNumber]); // Озвучиваем цвет N-го кубика
     Manipulator(ManipulatorState.Down, true, 60); // Отпускаем манипулятор после определения цвета кубика
@@ -141,11 +141,11 @@ brick.buttonRight.onEvent(ButtonEvent.Pressed, function () {
     if (btnRightEventDone) return; // Отключаем обработчик
     // btnRightEventDone = true; // Переставляе флаг, чтобы событие больше не работало
     brick.clearScreen();
-    let color = CheckColor(1000, true);
+    const color = CheckHtColor(2000, true);
     brick.clearScreen();
     brick.printValue("color", color, 1);
-    VoiceColor(color);
-    pause(1000);
+    // VoiceColor(color);
+    pause(500);
 });
 
 
@@ -160,7 +160,7 @@ function Main() {
     unloadingMechanismMotor.setInverted(true); // Включить реверс мотора механизма сброса
     Manipulator(ManipulatorState.Down, true, 40); // Предустановить манипулятор в положение раскрытия
     UnloadingMechanism(UnloadingMechanismState.Up, true, 10); // Предустановить механизм сброса в положение закрыт
-    htColorSensor.setHz(60); // Установить частоту подстветки
+    htColorSensor.setHz(60); // Установить частоту подстветки ht датчика цвета
 
     brick.setStatusLight(StatusLight.GreenPulse); // Сигнал о готовности светодиодами
     brick.printString("RUN", 7, 13);
@@ -259,7 +259,7 @@ function Main() {
     Manipulator(ManipulatorState.Down, true, 10); // Отпускаем манипулятор после определения цвета кубика
     pause(50);
     Manipulator(ManipulatorState.Up, true, 60); // Отпускаем манипулятор после определения цвета кубика
-    cubeColors.push(CheckColor(300, false)); // Сохраняем цвет в массив
+    cubeColors.push(CheckHtColor(300, false)); // Сохраняем цвет в массив
     brick.printValue(`cubeColors${6}`, cubeColors[6], 6); // Выводим на экран цвет N-го кубика
     VoiceColor(cubeColors[5]); // Озвучиваем цвет N-го кубика
     Manipulator(ManipulatorState.Down, true, 60); // Отпускаем манипулятор после определения цвета кубика

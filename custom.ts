@@ -30,7 +30,7 @@ function UnloadingMechanism(state: UnloadingMechanismState, hold: boolean, v: nu
 
 // // Получить цвет
 // function GetColor(debug: boolean = false): number {
-//     const rgbHsvl = sensors.getRgbHsvl(colorSensor);
+//     const rgbHsvl = sensors.getColorSensorRgbHsvl(colorSensor);
 //     const color = sensors.convertHsvlToColorNum(rgbHsvl[1], sensors.getHsvlToColorNumBoundaries(colorSensor));
 //     if (debug) {
 //         brick.clearScreen();
@@ -48,33 +48,47 @@ function UnloadingMechanism(state: UnloadingMechanismState, hold: boolean, v: nu
 
 // Получить цвет
 function GetHtColor(debug: boolean = false): number {
-    const rgb = htColorSensor.getActiveNormRGB();
-    const hsvl = htColorSensor.getActiveHSVL();
-    const color = sensors.convertHsvlToColorNum(hsvl, sensors.getHsvlToColorNumBoundaries2(htColorSensor));
+    const rgbwHsvl = htColorSensor.getActiveRGBWHSVL();
+    const color = sensors.convertHsvlToColorNum(rgbwHsvl[1], sensors.getHsvlToColorNumBoundaries2(htColorSensor));
     if (debug) {
         brick.clearScreen();
-        brick.printValue("r", rgb[0], 1);
-        brick.printValue("g", rgb[1], 2);
-        brick.printValue("b", rgb[2], 3);
-        brick.printValue("h", hsvl[0], 5);
-        brick.printValue("s", hsvl[1], 6);
-        brick.printValue("v", hsvl[2], 7);
-        brick.printValue("l", hsvl[3], 8);
-        brick.printValue("color", color, 10);
+        brick.printValue("r", rgbwHsvl[0][0], 1);
+        brick.printValue("g", rgbwHsvl[0][1], 2);
+        brick.printValue("b", rgbwHsvl[0][2], 3);
+        brick.printValue("w", rgbwHsvl[0][3], 4);
+        brick.printValue("h", rgbwHsvl[1][0], 6);
+        brick.printValue("s", rgbwHsvl[1][1], 7);
+        brick.printValue("v", rgbwHsvl[1][2], 8);
+        brick.printValue("l", rgbwHsvl[1][3], 9);
+        brick.printValue("color", color, 11);
     }
     return color;
 }
 
 // Проверка цвета
-function CheckColor(time: number, debug: boolean): number {
+// function CheckColor(time: number, debug: boolean): number {
+//     let colorSamples: number[] = [];
+//     control.timer1.reset();
+//     let prevTime = control.millis();
+//     while (control.timer1.millis() < time) {
+//         const currTime = control.millis();
+//         prevTime = currTime;
+//         const color = GetColor(debug);
+//         colorSamples.push(color);
+//         control.pauseUntilTimeMs(currTime, 10);
+//     }
+//     const colorResult = custom.mostFrequentNumber(colorSamples);
+//     return colorResult;
+// }
+
+// Проверка цвета
+function CheckHtColor(time: number, debug: boolean): number {
     let colorSamples: number[] = [];
     control.timer1.reset();
     let prevTime = control.millis();
     while (control.timer1.millis() < time) {
         const currTime = control.millis();
-        const dt = currTime - prevTime;
         prevTime = currTime;
-        // const color = GetColor(debug);
         const color = GetHtColor(debug);
         colorSamples.push(color);
         control.pauseUntilTimeMs(currTime, 10);
