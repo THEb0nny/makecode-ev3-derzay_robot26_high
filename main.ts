@@ -97,8 +97,7 @@ function Cube1Row(cube: number) {
 // Функция захвата и определение одного кубика
 function CubeCapture(cubeNumber: number, v: number = 50) {
     Manipulator(ManipulatorState.Up, true, v); // Манипулятор поднять для захвата N-го кубика
-    const color = CheckColor(300, false); // Запрашиваем и цвет
-    cubeColors.push(color); // Сохраняем цвет в массив
+    cubeColors.push(CheckColor(300, false)); // Запрашивают и сохраняем цвет в массив
     brick.printValue(`cubeColors${cubeNumber + 1}`, cubeColors[cubeNumber], cubeNumber + 1); // Выводим на экран цвет N-го кубика
     VoiceColor(cubeColors[cubeNumber]); // Озвучиваем цвет N-го кубика
     Manipulator(ManipulatorState.Down, true, 60); // Отпускаем манипулятор после определения цвета кубика
@@ -161,6 +160,7 @@ function Main() {
     unloadingMechanismMotor.setInverted(true); // Включить реверс мотора механизма сброса
     Manipulator(ManipulatorState.Down, true, 40); // Предустановить манипулятор в положение раскрытия
     UnloadingMechanism(UnloadingMechanismState.Up, true, 10); // Предустановить механизм сброса в положение закрыт
+    htColorSensor.setHz(60); // Установить частоту подстветки
 
     brick.setStatusLight(StatusLight.GreenPulse); // Сигнал о готовности светодиодами
     brick.printString("RUN", 7, 13);
@@ -175,7 +175,7 @@ function Main() {
     // console.log(`path: ${path.join(', ')}`);
 
     chassis.accelStartLinearDistMove(30, 60, 100, 50); // Плавный старт с стартовой зоны
-    navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { moveStartV: 60, moveMaxV: 80, accelStartDist: 50, turnV: 70, Kp: 0.2, Kd: 0.5 });
+    navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { moveStartV: 60, moveMaxV: 80, accelStartDist: 50, turnV: 60, Kp: 0.2, Kd: 0.8 });
     navigation.directionSpinTurn(0, 70);
     motions.rampLineFollowToDistanceByTwoSensors(170, 50, 50, MotionBraking.Hold, { vStart: 30, vMax: 60, vFinish: 30, Kp: 0.2, Kd: 0.5 });
     Cube2Row(0, 1);
@@ -195,55 +195,54 @@ function Main() {
     chassis.spinTurn(90, 70);
     motions.rampLineFollowToDistanceByTwoSensors(160, 50, 50, MotionBraking.Hold, { vStart: 30, vMax: 60, vFinish: 30, Kp: 0.2, Kd: 0.5 });
     Cube1Row(4);
-    control.runInParallel(function () {
-        pause(100);
-        Manipulator(ManipulatorState.Up, true, 50); // Поднимаем манипулятор
-    })
+    pause(50);
+    chassis.linearDistMove(80, 50, MotionBraking.Hold); // Подъезжаем к дальнему кубику
+    pause(50);
+    Manipulator(ManipulatorState.Up, true, 30); // Манипулятор поднять для захвата N-го кубика
+
     chassis.spinTurn(180, 70);
     motions.lineFollowToCrossIntersection(AfterLineMotion.SmoothRolling, { v: 60, Kp: 0.2, Kd: 0.5 });
 
     navigation.setCurrentPosition(12);
     navigation.setCurrentDirection(2);
 
+    let bestPathLength = Infinity;
     if (cubeColors[0] == 2) {
-        let tempPath: number[][] = [];
-        for (let i = 0; i < 2; i++) {
-            tempPath[i] = navigation.algorithmDFS(navigation.getCurrentPosition(), blueZoneCross[i]);
-            console.log(`tempPath[${i}](B): ${tempPath[i].join(', ')}`);
-        }
-        if (tempPath[0].length <= tempPath[1].length) {
-            path = tempPath[0];
-        } else {
-            path = tempPath[1];
+        for (let i = 0; i < blueZoneCross.length; i++) {
+            const currentPos = navigation.getCurrentPosition();
+            const tempPath = navigation.algorithmDFS(currentPos, blueZoneCross[i]);
+            console.log(`tempPath[${i}](B): ${tempPath.join(', ')}`);
+            if (tempPath.length < bestPathLength) {
+                bestPathLength = tempPath.length;
+                path = tempPath;
+            }
         }
     } else if (cubeColors[0] == 3) {
-        let tempPath: number[][] = [];
-        for (let i = 0; i < 2; i++) {
-            tempPath[i] = navigation.algorithmDFS(navigation.getCurrentPosition(), greenZoneCross[i]);
-            console.log(`tempPath[${i}](G): ${tempPath[i].join(', ')}`);
-        }
-        if (tempPath[0].length <= tempPath[1].length) {
-            path = tempPath[0];
-        } else {
-            path = tempPath[1];
+        for (let i = 0; i < greenZoneCross.length; i++) {
+            const currentPos = navigation.getCurrentPosition();
+            const tempPath = navigation.algorithmDFS(currentPos, greenZoneCross[i]);
+            console.log(`tempPath[${i}](G): ${tempPath.join(', ')}`);
+            if (tempPath.length < bestPathLength) {
+                bestPathLength = tempPath.length;
+                path = tempPath;
+            }
         }
     } else if (cubeColors[0] == 5) {
-        let tempPath: number[][] = [];
-        for (let i = 0; i < 2; i++) {
-            tempPath[i] = navigation.algorithmDFS(navigation.getCurrentPosition(), redZoneCross[i]);
-            console.log(`tempPath[${i}](R): ${tempPath[i].join(', ')}`);
-        }
-        if (tempPath[0].length <= tempPath[1].length) {
-            path = tempPath[0];
-        } else {
-            path = tempPath[1];
+        for (let i = 0; i < redZoneCross.length; i++) {
+            const currentPos = navigation.getCurrentPosition();
+            const tempPath = navigation.algorithmDFS(currentPos, redZoneCross[i]);
+            console.log(`tempPath[${i}](R): ${tempPath.join(', ')}`);
+            if (tempPath.length < bestPathLength) {
+                bestPathLength = tempPath.length;
+                path = tempPath;
+            }
         }
     } else {
         music.playSoundEffectUntilDone(sounds.informationError);
     }
 
     console.log(`path: ${path.join(', ')}`);
-    navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { moveStartV: 30, moveMaxV: 70, accelStartDist: 50, turnV: 70, Kp: 0.2, Kd: 0.5 });
+    navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { moveStartV: 30, moveMaxV: 70, accelStartDist: 50, turnV: 60, Kp: 0.2, Kd: 0.5 });
 
     if ([1, 3, 5].indexOf(navigation.getCurrentPosition()) !== -1) { // Снизу
         navigation.directionSpinTurn(1, 70);
@@ -254,8 +253,22 @@ function Main() {
     chassis.linearDistMove(-50, 50, MotionBraking.Hold);
     chassis.spinTurn(180, 70);
     UnloadingMechanism(UnloadingMechanismState.Down, false);
-    pause(100);
+    pause(50);
     UnloadingMechanism(UnloadingMechanismState.Up, true);
+
+    Manipulator(ManipulatorState.Down, true, 10); // Отпускаем манипулятор после определения цвета кубика
+    pause(50);
+    Manipulator(ManipulatorState.Up, true, 60); // Отпускаем манипулятор после определения цвета кубика
+    cubeColors.push(CheckColor(300, false)); // Сохраняем цвет в массив
+    brick.printValue(`cubeColors${6}`, cubeColors[6], 6); // Выводим на экран цвет N-го кубика
+    VoiceColor(cubeColors[5]); // Озвучиваем цвет N-го кубика
+    Manipulator(ManipulatorState.Down, true, 60); // Отпускаем манипулятор после определения цвета кубика
+    control.runInParallel(function () {
+        pause(100);
+        Manipulator(ManipulatorState.Up, true, 50); // Поднимаем манипулятор
+    });
+
+
 
     // motions.lineFollowToCrossIntersection(AfterLineMotion.SmoothRolling); // На следующем перекрёстке останавливаемся
     // pause(50);
