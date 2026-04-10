@@ -4,12 +4,14 @@
     "description": "",
     "dependencies": {
         "ev3": "*",
-        "promrobo21": "github:theb0nny/makecode-ev3-promrobo21#v8.9.1"
+        "promrobo21": "github:theb0nny/makecode-ev3-promrobo21#v8.9.1",
+        "ht-color-sensor-v2": "github:theb0nny/makecode-ev3-hitechnic-color-sensor-v2#v2.0.1"
     },
     "files": [
         "main.ts",
         "README.md",
-        "custom.ts"
+        "custom.ts",
+        "ht_color_sensor.ts"
     ],
     "testFiles": [],
     "targetVersions": {

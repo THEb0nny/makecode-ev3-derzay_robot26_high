@@ -28,19 +28,38 @@ function UnloadingMechanism(state: UnloadingMechanismState, hold: boolean, v: nu
     unloadingMechanismMotor.stop();
 }
 
+// // Получить цвет
+// function GetColor(debug: boolean = false): number {
+//     const rgbHsvl = sensors.getRgbHsvl(colorSensor);
+//     const color = sensors.convertHsvlToColorNum(rgbHsvl[1], sensors.getHsvlToColorNumBoundaries(colorSensor));
+//     if (debug) {
+//         brick.clearScreen();
+//         brick.printValue("r", rgbHsvl[0][0], 1);
+//         brick.printValue("g", rgbHsvl[0][1], 2);
+//         brick.printValue("b", rgbHsvl[0][2], 3);
+//         brick.printValue("h", rgbHsvl[1][0], 5);
+//         brick.printValue("s", rgbHsvl[1][1], 6);
+//         brick.printValue("v", rgbHsvl[1][2], 7);
+//         brick.printValue("l", rgbHsvl[1][3], 8);
+//         brick.printValue("color", color, 10);
+//     }
+//     return color;
+// }
+
 // Получить цвет
-function GetColor(debug: boolean = false): number {
-    const rgbHsvl = sensors.getRgbHsvl(colorSensor);
-    const color = sensors.convertHsvlToColorNum(rgbHsvl[1], sensors.getHsvlToColorNumBoundaries(colorSensor));
+function GetHtColor(debug: boolean = false): number {
+    const rgb = htColorSensor.getActiveNormRGB();
+    const hsvl = htColorSensor.getActiveHSVL();
+    const color = sensors.convertHsvlToColorNum(hsvl, sensors.getHsvlToColorNumBoundaries2(htColorSensor));
     if (debug) {
         brick.clearScreen();
-        brick.printValue("r", rgbHsvl[0][0], 1);
-        brick.printValue("g", rgbHsvl[0][1], 2);
-        brick.printValue("b", rgbHsvl[0][2], 3);
-        brick.printValue("h", rgbHsvl[1][0], 5);
-        brick.printValue("s", rgbHsvl[1][1], 6);
-        brick.printValue("v", rgbHsvl[1][2], 7);
-        brick.printValue("l", rgbHsvl[1][3], 8);
+        brick.printValue("r", rgb[0], 1);
+        brick.printValue("g", rgb[1], 2);
+        brick.printValue("b", rgb[2], 3);
+        brick.printValue("h", hsvl[0], 5);
+        brick.printValue("s", hsvl[1], 6);
+        brick.printValue("v", hsvl[2], 7);
+        brick.printValue("l", hsvl[3], 8);
         brick.printValue("color", color, 10);
     }
     return color;
@@ -55,7 +74,8 @@ function CheckColor(time: number, debug: boolean): number {
         const currTime = control.millis();
         const dt = currTime - prevTime;
         prevTime = currTime;
-        const color = GetColor(debug);
+        // const color = GetColor(debug);
+        const color = GetHtColor(debug);
         colorSamples.push(color);
         control.pauseUntilTimeMs(currTime, 10);
     }
