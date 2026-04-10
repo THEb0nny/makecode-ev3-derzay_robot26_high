@@ -13,7 +13,7 @@ function Manipulator(state: ManipulatorState, hold: boolean, v: number = 50) {
     const dir = state == ManipulatorState.Down ? 1 : -1;
     manipulatorMotor.run(Math.abs(v) * dir);
     pause(10);
-    manipulatorMotor.pauseUntilStalled();
+    manipulatorMotor.pauseUntilStalled(1500);
     manipulatorMotor.setBrake(hold);
     manipulatorMotor.stop();
 }
@@ -23,7 +23,7 @@ function UnloadingMechanism(state: UnloadingMechanismState, hold: boolean, v: nu
     const dir = state == UnloadingMechanismState.Down ? 1 : -1;
     unloadingMechanismMotor.run(Math.abs(v) * dir);
     pause(10);
-    unloadingMechanismMotor.pauseUntilStalled();
+    unloadingMechanismMotor.pauseUntilStalled(1500);
     unloadingMechanismMotor.setBrake(hold);
     unloadingMechanismMotor.stop();
 }
