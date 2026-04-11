@@ -96,9 +96,9 @@ let cubeColors: number[] = []; // Массив, чтобы сохранить ц
 let path: number[] = []; // Переменная для хранения пути
 
 const baseIntersection = [0, 28]; // Номера перекрёстков, которые ведут на базу
-const redZoneCross = [2, 25, 27]; // Переменная для хранения перекрёстков с красной зоной
-const greenZoneCross = [4, 23]; // Переменная для хранения перекрёстков с зелёной зоной
-const blueZoneCross = [6, 21, 14]; // Переменная для хранения перекрёстков с синей зоной
+const redZoneIntersection = [2, 25, 27]; // Переменная для хранения перекрёстков с красной зоной
+const greenZoneIntersection = [4, 23]; // Переменная для хранения перекрёстков с зелёной зоной
+const blueZoneIntersection = [6, 21, 14]; // Переменная для хранения перекрёстков с синей зоной
 
 // Узнать цвет кубика и озвучить
 function GetCubeColor() {
@@ -174,9 +174,9 @@ function Main() {
     for (let i = 0; i < 6; i++) { // Едем раскладывать 6 кубиков
         let bestPathLength = Infinity;
         if (cubeColors[i] == 2) { // Синий
-            for (let j = 0; j < blueZoneCross.length; j++) {
+            for (let j = 0; j < blueZoneIntersection.length; j++) {
                 const currentPos = navigation.getCurrentPosition();
-                const tempPath = navigation.algorithmDFS(currentPos, blueZoneCross[j]);
+                const tempPath = navigation.algorithmDFS(currentPos, blueZoneIntersection[j]);
                 console.log(`tempPath[${j}](B): ${tempPath.join(', ')}`);
                 if (tempPath.length <= bestPathLength) {
                     bestPathLength = tempPath.length;
@@ -184,9 +184,9 @@ function Main() {
                 }
             }
         } else if (cubeColors[i] == 3) { // Зелёный
-            for (let j = 0; j < greenZoneCross.length; j++) {
+            for (let j = 0; j < greenZoneIntersection.length; j++) {
                 const currentPos = navigation.getCurrentPosition();
-                const tempPath = navigation.algorithmDFS(currentPos, greenZoneCross[j]);
+                const tempPath = navigation.algorithmDFS(currentPos, greenZoneIntersection[j]);
                 console.log(`tempPath[${j}](G): ${tempPath.join(', ')}`);
                 if (tempPath.length <= bestPathLength) {
                     bestPathLength = tempPath.length;
@@ -194,9 +194,9 @@ function Main() {
                 }
             }
         } else if (cubeColors[i] == 5) { // Красный
-            for (let j = 0; j < redZoneCross.length; j++) {
+            for (let j = 0; j < redZoneIntersection.length; j++) {
                 const currentPos = navigation.getCurrentPosition();
-                const tempPath = navigation.algorithmDFS(currentPos, redZoneCross[j]);
+                const tempPath = navigation.algorithmDFS(currentPos, redZoneIntersection[j]);
                 console.log(`tempPath[${j}](R): ${tempPath.join(', ')}`);
                 if (tempPath.length <= bestPathLength) {
                     bestPathLength = tempPath.length;
@@ -297,9 +297,9 @@ function Main() {
     for (let i = 6; i < 10; i++) {
         let bestPathLength = Infinity;
         if (cubeColors[i] == 2) { // Синий
-            for (let j = 0; j < blueZoneCross.length; j++) {
+            for (let j = 0; j < blueZoneIntersection.length; j++) {
                 const currentPos = navigation.getCurrentPosition();
-                const tempPath = navigation.algorithmDFS(currentPos, blueZoneCross[j]);
+                const tempPath = navigation.algorithmDFS(currentPos, blueZoneIntersection[j]);
                 console.log(`tempPath[${j}](B): ${tempPath.join(', ')}`);
                 if (tempPath.length <= bestPathLength) {
                     bestPathLength = tempPath.length;
@@ -307,9 +307,9 @@ function Main() {
                 }
             }
         } else if (cubeColors[i] == 3) { // Зелёный
-            for (let j = 0; j < greenZoneCross.length; j++) {
+            for (let j = 0; j < greenZoneIntersection.length; j++) {
                 const currentPos = navigation.getCurrentPosition();
-                const tempPath = navigation.algorithmDFS(currentPos, greenZoneCross[j]);
+                const tempPath = navigation.algorithmDFS(currentPos, greenZoneIntersection[j]);
                 console.log(`tempPath[${j}](G): ${tempPath.join(', ')}`);
                 if (tempPath.length <= bestPathLength) {
                     bestPathLength = tempPath.length;
@@ -317,9 +317,9 @@ function Main() {
                 }
             }
         } else if (cubeColors[i] == 5) { // Красный
-            for (let j = 0; j < redZoneCross.length; j++) {
+            for (let j = 0; j < redZoneIntersection.length; j++) {
                 const currentPos = navigation.getCurrentPosition();
-                const tempPath = navigation.algorithmDFS(currentPos, redZoneCross[j]);
+                const tempPath = navigation.algorithmDFS(currentPos, redZoneIntersection[j]);
                 console.log(`tempPath[${j}](R): ${tempPath.join(', ')}`);
                 if (tempPath.length <= bestPathLength) {
                     bestPathLength = tempPath.length;
