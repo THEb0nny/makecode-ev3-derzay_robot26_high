@@ -80,39 +80,6 @@ navigation.buildGraph([
 ]);
 
 
-// Функция для одного ряда кубиков
-function Cube2Row(firstCube: number, secondCube: number) {
-    CubeCapture(firstCube, 20); // Захватываем ближний кубик
-    pause(50);
-    chassis.linearDistMove(80, 50, MotionBraking.Hold); // Подъезжаем к дальнему кубику
-    pause(50);
-    CubeCapture(secondCube, 60); // Захватываем дальний кубик
-}
-
-// Функция для одного ряда кубиков
-function Cube1Row(cube: number) {
-    CubeCapture(cube, 30); // Захватываем ближний кубик
-}
-
-// Функция захвата и определение одного кубика
-function CubeCapture(cubeNumber: number, v: number = 50) {
-    Manipulator(ManipulatorState.Up, true, v); // Манипулятор поднять для захвата N-го кубика
-    cubeColors.push(CheckHtColor(300, false)); // Запрашивают и сохраняем цвет в массив
-    brick.printValue(`cubeColors${cubeNumber + 1}`, cubeColors[cubeNumber], cubeNumber + 1); // Выводим на экран цвет N-го кубика
-    VoiceColor(cubeColors[cubeNumber]); // Озвучиваем цвет N-го кубика
-    Manipulator(ManipulatorState.Down, true, 60); // Отпускаем манипулятор после определения цвета кубика
-}
-
-// Функция, для возвращения к перекрёстку ряда кубиков
-// function ReturnToCrossRowCubes() {
-//     chassis.linearDistMove(-20, 60, MotionBraking.Hold); // Отъезжаем назад на линию
-//     pause(50);
-//     chassis.spinTurn(180, 70); // Поворачиваемся
-//     pause(50);
-//     motions.lineFollowToCrossIntersection(AfterLineMotion.SmoothRolling); // Движемся до перекрёстка
-//     pause(50);
-// }
-
 let cubeColors: number[] = []; // Массив, чтобы сохранить цвета кубиков
 
 let path: number[] = []; // Переменная для хранения пути
@@ -147,6 +114,40 @@ brick.buttonRight.onEvent(ButtonEvent.Pressed, function () {
     VoiceColor(color);
     pause(500);
 });
+
+// Функция для одного ряда кубиков
+function Cube2Row(firstCube: number, secondCube: number) {
+    CubeCapture(firstCube, 20); // Захватываем ближний кубик
+    pause(50);
+    chassis.linearDistMove(80, 50, MotionBraking.Hold); // Подъезжаем к дальнему кубику
+    pause(50);
+    CubeCapture(secondCube, 60); // Захватываем дальний кубик
+}
+
+
+// Функция для одного ряда кубиков
+function Cube1Row(cube: number) {
+    CubeCapture(cube, 30); // Захватываем ближний кубик
+}
+
+// Функция захвата и определение одного кубика
+function CubeCapture(cubeNumber: number, v: number = 50) {
+    Manipulator(ManipulatorState.Up, true, v); // Манипулятор поднять для захвата N-го кубика
+    cubeColors.push(CheckHtColor(300, false)); // Запрашивают и сохраняем цвет в массив
+    brick.printValue(`cubeColors${cubeNumber + 1}`, cubeColors[cubeNumber], cubeNumber + 1); // Выводим на экран цвет N-го кубика
+    VoiceColor(cubeColors[cubeNumber]); // Озвучиваем цвет N-го кубика
+    Manipulator(ManipulatorState.Down, true, 60); // Отпускаем манипулятор после определения цвета кубика
+}
+
+// Функция, для возвращения к перекрёстку ряда кубиков
+// function ReturnToCrossRowCubes() {
+//     chassis.linearDistMove(-20, 60, MotionBraking.Hold); // Отъезжаем назад на линию
+//     pause(50);
+//     chassis.spinTurn(180, 70); // Поворачиваемся
+//     pause(50);
+//     motions.lineFollowToCrossIntersection(AfterLineMotion.SmoothRolling); // Движемся до перекрёстка
+//     pause(50);
+// }
 
 
 // Главная функция решения задачи
