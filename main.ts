@@ -96,6 +96,7 @@ let cubeColors: number[] = []; // Массив, чтобы сохранить ц
 let path: number[] = []; // Переменная для хранения пути
 
 const baseIntersection = [0, 28]; // Номера перекрёстков, которые ведут на базу
+const validColors = [2, 3, 5] // Цвета, с которыми мы работаем
 const redZoneIntersection = [2, 25, 27]; // Переменная для хранения перекрёстков с красной зоной
 const greenZoneIntersection = [4, 23]; // Переменная для хранения перекрёстков с зелёной зоной
 const blueZoneIntersection = [6, 21, 14]; // Переменная для хранения перекрёстков с синей зоной
@@ -172,40 +173,36 @@ function Main() {
     navigation.setCurrentDirection(2);
 
     for (let i = 0; i < 6; i++) { // Едем раскладывать 6 кубиков
-        let bestPathLength = Infinity;
-        if (cubeColors[i] == 2) { // Синий
-            for (let j = 0; j < blueZoneIntersection.length; j++) {
-                const currentPos = navigation.getCurrentPosition();
-                const tempPath = navigation.algorithmDFS(currentPos, blueZoneIntersection[j]);
-                console.log(`tempPath[${j}](B): ${tempPath.join(', ')}`);
-                if (tempPath.length <= bestPathLength) {
-                    bestPathLength = tempPath.length;
-                    path = tempPath;
-                }
-            }
-        } else if (cubeColors[i] == 3) { // Зелёный
-            for (let j = 0; j < greenZoneIntersection.length; j++) {
-                const currentPos = navigation.getCurrentPosition();
-                const tempPath = navigation.algorithmDFS(currentPos, greenZoneIntersection[j]);
-                console.log(`tempPath[${j}](G): ${tempPath.join(', ')}`);
-                if (tempPath.length <= bestPathLength) {
-                    bestPathLength = tempPath.length;
-                    path = tempPath;
-                }
-            }
-        } else if (cubeColors[i] == 5) { // Красный
-            for (let j = 0; j < redZoneIntersection.length; j++) {
-                const currentPos = navigation.getCurrentPosition();
-                const tempPath = navigation.algorithmDFS(currentPos, redZoneIntersection[j]);
-                console.log(`tempPath[${j}](R): ${tempPath.join(', ')}`);
-                if (tempPath.length <= bestPathLength) {
-                    bestPathLength = tempPath.length;
-                    path = tempPath;
-                }
-            }
-        } else { // Какая-то жопа
+        let targetZones: number[] = []; // Целевая зона
+        let color = cubeColors[i]; // Цвет текущего кубика
+        // Если определился неправильный цвет, ищем первый нормальный цвет
+        if (validColors.indexOf(color) == -1) {
             music.playSoundEffectUntilDone(sounds.informationError);
-            brick.exitProgram();
+            for (let j = 0; j < cubeColors.length; j++) {
+                if (validColors.indexOf(cubeColors[j]) != -1) {
+                    color = cubeColors[j];
+                    break;
+                }
+            }
+        }
+        // Выбираем зону по цвету
+        if (color == 2) targetZones = blueZoneIntersection; // Синяя зона
+        else if (color == 3) targetZones = greenZoneIntersection; // Зелёная зона
+        else if (color == 5) targetZones = redZoneIntersection; // Красная зона
+        else {
+            music.playSoundEffectUntilDone(sounds.informationError);
+            brick.exitProgram(); // Вообще не нашли нормальный цвет
+        }
+
+        let bestPathLength = Infinity; // Вспомогательная переменная для определния самого короткого пути
+        for (let j = 0; j < targetZones.length; j++) {
+            const currentPos = navigation.getCurrentPosition(); // Получить текущую позицию
+            const tempPath = navigation.algorithmDFS(currentPos, targetZones[j]); // Путь от текущей позиции к i позиции цветной зоны
+            console.log(`tempPath[${j}](${cubeColors[i]}): ${tempPath.join(', ')}`); // Вывести в консоль
+            if (tempPath.length <= bestPathLength) { // Обновляем путь, если он короткий или равен прошлому
+                bestPathLength = tempPath.length;
+                path = tempPath;
+            }
         }
 
         console.log(`path: ${path.join(', ')}`);
