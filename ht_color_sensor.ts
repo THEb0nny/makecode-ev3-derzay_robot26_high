@@ -13,8 +13,8 @@ namespace sensors {
         purpleBoundary: number;
     }
 
-    let minRgbColorSensors: number[][] = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]; // Минимальные значения RGB для датчиков цвета
-    let maxRgbColorSensors: number[][] = [[255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255]]; // Максимальные значения RGB для датчиков цвета
+    // let minRgbColorSensors: number[][] = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]; // Минимальные значения RGB для датчиков цвета
+    // let maxRgbColorSensors: number[][] = [[255, 255, 255], [255, 255, 255], [255, 255, 255], [255, 255, 255]]; // Максимальные значения RGB для датчиков цвета
 
     let whiteBoundaryColorSensors: number[] = [5, 5, 5, 5];
     let blackBoundaryColorSensors: number[] = [1, 1, 1, 1];
@@ -27,33 +27,33 @@ namespace sensors {
     let blueBoundaryColorSensors: number[] = [270, 270, 270, 270];
     let purpleBoundaryColorSensors: number[] = [-1, -1, -1, -1];
 
-    export function setHtColorSensorMinRgbValues(sensor: sensors.HiTechnicColorSensor2, minR: number, minG: number, minB: number) {
-        if (minR < 0 || minG < 0 || minB < 0) {
-            console.log(`Warning: Negative min RGB values for CS${sensor.port()}. Using absolute value.`);
-        }
-        const index = sensor.port() - 1;
-        minRgbColorSensors[index] = [Math.abs(minR), Math.abs(minG), Math.abs(minB)];
-    }
+    // export function setHtColorSensorMinRgbValues(sensor: sensors.HiTechnicColorSensor2, minR: number, minG: number, minB: number) {
+    //     if (minR < 0 || minG < 0 || minB < 0) {
+    //         console.log(`Warning: Negative min RGB values for CS${sensor.port()}. Using absolute value.`);
+    //     }
+    //     const index = sensor.port() - 1;
+    //     minRgbColorSensors[index] = [Math.abs(minR), Math.abs(minG), Math.abs(minB)];
+    // }
 
-    export function setHtColorSensorMaxRgbValues(sensor: sensors.HiTechnicColorSensor2, maxR: number, maxG: number, maxB: number) {
-        if (maxR < 0 || maxG < 0 || maxB < 0) {
-            console.log(`Warning: Negative max RGB values for CS${sensor.port()}. Using absolute value.`);
-        }
-        const index = sensor.port() - 1;
-        maxRgbColorSensors[index] = [Math.abs(maxR), Math.abs(maxG), Math.abs(maxB)];
-    }
+    // export function setHtColorSensorMaxRgbValues(sensor: sensors.HiTechnicColorSensor2, maxR: number, maxG: number, maxB: number) {
+    //     if (maxR < 0 || maxG < 0 || maxB < 0) {
+    //         console.log(`Warning: Negative max RGB values for CS${sensor.port()}. Using absolute value.`);
+    //     }
+    //     const index = sensor.port() - 1;
+    //     maxRgbColorSensors[index] = [Math.abs(maxR), Math.abs(maxG), Math.abs(maxB)];
+    // }
 
-    export function getMinRgbHtColorSensor(sensor: sensors.HiTechnicColorSensor2): number[] {
-        const index = sensor.port() - 1;
-        return minRgbColorSensors[index];
-    }
+    // export function getMinRgbHtColorSensor(sensor: sensors.HiTechnicColorSensor2): number[] {
+    //     const index = sensor.port() - 1;
+    //     return minRgbColorSensors[index];
+    // }
 
-    export function getMaxRgbHtColorSensor(sensor: sensors.HiTechnicColorSensor2): number[] {
-        const index = sensor.port() - 1;
-        return maxRgbColorSensors[index];
-    }
+    // export function getMaxRgbHtColorSensor(sensor: sensors.HiTechnicColorSensor2): number[] {
+    //     const index = sensor.port() - 1;
+    //     return maxRgbColorSensors[index];
+    // }
 
-    export function setHsvlToColorNumBoundaries2(sensor: sensors.HiTechnicColorSensor2, boundaries: ColorBoundaries) {
+    export function setHsvlToColorNumBoundariesHtColorSensor(sensor: sensors.HiTechnicColorSensor2, boundaries: ColorBoundaries) {
         const index = sensor.port() - 1;
         whiteBoundaryColorSensors[index] = boundaries.whiteBoundary;
         blackBoundaryColorSensors[index] = boundaries.blackBoundary;
@@ -67,7 +67,7 @@ namespace sensors {
         purpleBoundaryColorSensors[index] = boundaries.purpleBoundary;
     }
 
-    export function getHsvlToColorNumBoundaries2(sensor: sensors.HiTechnicColorSensor2): ColorBoundaries {
+    export function getHsvlToColorNumBoundariesHtColorSensor(sensor: sensors.HiTechnicColorSensor2): ColorBoundaries {
         const index = sensor.port() - 1;
         return {
             whiteBoundary: whiteBoundaryColorSensors[index],

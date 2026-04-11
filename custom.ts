@@ -49,7 +49,7 @@ function UnloadingMechanism(state: UnloadingMechanismState, hold: boolean, v: nu
 // Получить цвет
 function GetHtColor(debug: boolean = false): number {
     const rgbwHsvl = htColorSensor.getActiveRGBWHSVL();
-    const color = sensors.convertHsvlToColorNum(rgbwHsvl[1], sensors.getHsvlToColorNumBoundaries2(htColorSensor));
+    const color = sensors.convertHsvlToColorNum(rgbwHsvl[1], sensors.getHsvlToColorNumBoundariesHtColorSensor(htColorSensor));
     if (debug) {
         brick.clearScreen();
         brick.printValue("r", rgbwHsvl[0][0], 1);

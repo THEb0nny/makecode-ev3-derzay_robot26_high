@@ -34,7 +34,7 @@ const unloadingMechanismMotor = motors.mediumD; // Переменная объе
 
 const htColorSensor = sensors.htColor3; // Установка ht датчика цвета определяющий цвет кубика
 
-sensors.setHsvlToColorNumBoundaries2(htColorSensor, {
+sensors.setHsvlToColorNumBoundariesHtColorSensor(htColorSensor, {
     coloredBoundary: 50, // S
     whiteBoundary: 10, // V
     blackBoundary: 5, // V
