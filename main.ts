@@ -18,6 +18,7 @@ const unloadingMechanismMotor = motors.mediumD; // Переменная объе
 
 const htColorSensor = sensors.htColor3; // Установка ht датчика цвета определяющий цвет кубика
 
+// Установить границы преобразования hsvl в цветовые коды
 sensors.setHsvlToColorNumBoundariesHtColorSensor(htColorSensor, {
     coloredBoundary: 50, // S
     whiteBoundary: 10, // V
@@ -29,7 +30,7 @@ sensors.setHsvlToColorNumBoundariesHtColorSensor(htColorSensor, {
     greenBoundary: 185, // H
     blueBoundary: 270, // H
     purpleBoundary: -1 // H
-}); // Установить границы преобразования hsvl в цветовые коды
+});
 
 navigation.setNodesCount(29); // Количество узловых точек
 navigation.buildGraph([
