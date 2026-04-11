@@ -291,6 +291,7 @@ function Main() {
         }
     }
 
+    // Записываем где сейчас находимся и указываем текущее направление
     navigation.setCurrentPosition(17);
     navigation.setCurrentDirection(2);
 
