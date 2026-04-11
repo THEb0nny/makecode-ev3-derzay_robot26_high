@@ -77,16 +77,8 @@ navigation.buildGraph([
     { from: 24, to: 26, direction: NavDirection.LeftRight, weight: 12 },
     { from: 26, to: 27, direction: NavDirection.RightLeft, weight: 7.5 },
     { from: 26, to: 28, direction: NavDirection.DownUp, weight: 3 },
-]);
+]); // Строим матрицы смежности навигации по рёбрам
 
-
-let cubeColors: number[] = []; // Массив, чтобы сохранить цвета кубиков
-
-let path: number[] = []; // Переменная для хранения пути
-
-const redZoneCross: number[] = [2, 25, 27]; // Переменная для хранения перекрёстков с красной зоной
-const greenZoneCross: number[] = [4, 23]; // Переменная для хранения перекрёстков с зелёной зоной
-const blueZoneCross: number[] = [6, 21, 14]; // Переменная для хранения перекрёстков с синей зоной
 
 // let btnLeftEventDone = false; // Переменная-флаг выполнения события нажатия на левую кнопку
 let btnRightEventDone = false; // Переменная-флаг выполнения события нажатия на правую кнопку
@@ -114,6 +106,16 @@ brick.buttonRight.onEvent(ButtonEvent.Pressed, function () {
     pause(500);
 });
 
+
+let cubeColors: number[] = []; // Массив, чтобы сохранить цвета кубиков
+
+let path: number[] = []; // Переменная для хранения пути
+
+const redZoneCross: number[] = [2, 25, 27]; // Переменная для хранения перекрёстков с красной зоной
+const greenZoneCross: number[] = [4, 23]; // Переменная для хранения перекрёстков с зелёной зоной
+const blueZoneCross: number[] = [6, 21, 14]; // Переменная для хранения перекрёстков с синей зоной
+
+// Узнать цвет кубика и озвучить
 function GetCubeColor() {
     const color = CheckHtColor(300, false); // Запрашиваем цвет
     cubeColors.push(color); // Сохраняем цвет в массив
@@ -124,14 +126,14 @@ function GetCubeColor() {
 
 // Главная функция решения задачи
 function Main() {
-    sensors.preparationLineSensor(); // Опрос датчиков цвет
+    sensors.preparationLineSensor(); // Опрос датчиков линии
     // for (let i = 0; i < 10; i++) { // Опрос датчиков, чтобы те включились
     //     colorSensor.rgbRaw();
     //     pause(5);
     // }
     manipulatorMotor.setInverted(true); // Включить реверс мотора манипулятора
     unloadingMechanismMotor.setInverted(true); // Включить реверс мотора механизма сброса
-    Manipulator(ManipulatorState.Down, true, 40); // Предустановить манипулятор в положение раскрытия
+    Manipulator(ManipulatorState.Down, true, 30); // Предустановить манипулятор в положение раскрытия
     UnloadingMechanism(UnloadingMechanismState.Up, true, 10); // Предустановить механизм сброса в положение закрыт
     htColorSensor.setHz(60); // Установить частоту подстветки ht датчика цвета
 
@@ -139,45 +141,45 @@ function Main() {
     brick.printString("RUN", 7, 13);
     brick.buttonEnter.pauseUntil(ButtonEvent.Pressed); // Ожидание нажатие кнопки
     brick.setStatusLight(StatusLight.Off); // Выключаем светодиоды
+    brick.clearScreen(); // Очистить экран
     // btnLeftEventDone = true; // Выключить обработчик левой кнопки
     btnRightEventDone = true; // Выключить обработчик правой кнопки
-    brick.clearScreen(); // Очистить экран
 
+    //// Решение задачи
     // Едет с базы до точки 8
     navigation.setCurrentPosition(0);
     navigation.setCurrentDirection(0);
-    path = navigation.algorithmDFS(0, 8);
+    path = navigation.algorithmDFS(navigation.getCurrentPosition(), 8); // Расчитываем как доехать до вершины
     // console.log(`path: ${path.join(', ')}`);
     chassis.accelStartLinearDistMove(30, 50, 100, 50); // Плавный старт с стартовой зоны
-    navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { moveStartV: 50, moveMaxV: 60, accelStartDist: 50, turnV: 60, Kp: 0.2, Kd: 1 });
+    navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { vStartMove: 50, vMaxMove: 70, accelStartDist: 50, vTurn: 60, Kp: 0.2, Kd: 1 });
 
-    // Поворачиваемся первому ряду кубиков снизу
-    navigation.directionSpinTurn(0, 60);
+    navigation.directionSpinTurn(0, 60); // Поворачиваемся к первому ряду кубиков снизу
 
     for (let i = 0; i < 3; i++) {
+        // Двигаемся к кубикам на расстояние по линии
         motions.rampLineFollowToDistanceByTwoSensors(170, 50, 50, MotionBraking.Hold, { vStart: 30, vMax: 60, vFinish: 30, Kp: 0.2, Kd: 0.5 });
 
-        Manipulator(ManipulatorState.Up, true, 20); // Манипулятор поднять для захвата N-го кубика
-        GetCubeColor();
+        Manipulator(ManipulatorState.Up, true, 20); // Манипулятор поднять для захвата кубика
+        GetCubeColor(); // Узнать цвет поднятого кубика и озвучить
         Manipulator(ManipulatorState.Down, true, 60); // Отпускаем манипулятор после определения цвета кубика
 
         // pause(50);
         chassis.linearDistMove(80, 40, MotionBraking.Hold); // Подъезжаем к дальнему кубику
         // pause(50);
 
-        if (i != 2) {
-            Manipulator(ManipulatorState.Up, true, 50); // Манипулятор поднять для захвата N-го кубика
-            GetCubeColor();
+        if (i != 2) { // Если не второй ряд кубиков
+            Manipulator(ManipulatorState.Up, true, 50); // Манипулятор поднять для захвата кубика
+            GetCubeColor(); // Узнать цвет поднятого кубика и озвучить
             Manipulator(ManipulatorState.Down, true, 60); // Отпускаем манипулятор после определения цвета кубика
-        } else {
-            Manipulator(ManipulatorState.Up, true, 20); // Манипулятор поднять для захвата N-го кубика
+        } else { // Хватаем 6 кубик, который не помещается
+            Manipulator(ManipulatorState.Up, true, 20); // Манипулятор поднять для захвата кубика
         }
 
-        chassis.spinTurn(180, 60);
-        // motions.lineFollowToCrossIntersection(AfterLineMotion.SmoothRolling, { v: 60, Kp: 0.2, Kd: 0.5 });
-        motions.rampLineFollowToCrossIntersection(200, 50, 50, AfterLineMotion.SmoothRolling, { vStart: 30, vMax: 50, vFinish: 40, Kp: 0.2, Kd: 0.5 })
+        chassis.spinTurn(180, 60); // Развернуться в противоположную сторону
+        motions.rampLineFollowToCrossIntersection(200, 50, 50, AfterLineMotion.SmoothRolling, { vStart: 30, vMax: 60, vFinish: 40, Kp: 0.2, Kd: 0.5 });
 
-        if (i != 2) {
+        if (i != 2) { // Если i не второй, тогда двигаться к следующему ряду
             chassis.spinTurn(90, 70);
             motions.lineFollowToCrossIntersection(AfterLineMotion.SmoothRolling, { v: 60, Kp: 0.2, Kd: 0.5 });
             chassis.spinTurn(90, 70);
@@ -187,33 +189,33 @@ function Main() {
     navigation.setCurrentPosition(12);
     navigation.setCurrentDirection(2);
 
-    for (let c = 0; c < 6; c++) {
+    for (let i = 0; i < 6; i++) {
         let bestPathLength = Infinity;
-        if (cubeColors[c] == 2) { // Синий
-            for (let i = 0; i < blueZoneCross.length; i++) {
+        if (cubeColors[i] == 2) { // Синий
+            for (let j = 0; j < blueZoneCross.length; j++) {
                 const currentPos = navigation.getCurrentPosition();
-                const tempPath = navigation.algorithmDFS(currentPos, blueZoneCross[i]);
-                console.log(`tempPath[${i}](B): ${tempPath.join(', ')}`);
+                const tempPath = navigation.algorithmDFS(currentPos, blueZoneCross[j]);
+                console.log(`tempPath[${j}](B): ${tempPath.join(', ')}`);
                 if (tempPath.length <= bestPathLength) {
                     bestPathLength = tempPath.length;
                     path = tempPath;
                 }
             }
-        } else if (cubeColors[c] == 3) { // Зелёный
-            for (let i = 0; i < greenZoneCross.length; i++) {
+        } else if (cubeColors[i] == 3) { // Зелёный
+            for (let j = 0; j < greenZoneCross.length; j++) {
                 const currentPos = navigation.getCurrentPosition();
-                const tempPath = navigation.algorithmDFS(currentPos, greenZoneCross[i]);
-                console.log(`tempPath[${i}](G): ${tempPath.join(', ')}`);
+                const tempPath = navigation.algorithmDFS(currentPos, greenZoneCross[j]);
+                console.log(`tempPath[${j}](G): ${tempPath.join(', ')}`);
                 if (tempPath.length <= bestPathLength) {
                     bestPathLength = tempPath.length;
                     path = tempPath;
                 }
             }
-        } else if (cubeColors[c] == 5) { // Красный
-            for (let i = 0; i < redZoneCross.length; i++) {
+        } else if (cubeColors[i] == 5) { // Красный
+            for (let j = 0; j < redZoneCross.length; j++) {
                 const currentPos = navigation.getCurrentPosition();
-                const tempPath = navigation.algorithmDFS(currentPos, redZoneCross[i]);
-                console.log(`tempPath[${i}](R): ${tempPath.join(', ')}`);
+                const tempPath = navigation.algorithmDFS(currentPos, redZoneCross[j]);
+                console.log(`tempPath[${j}](R): ${tempPath.join(', ')}`);
                 if (tempPath.length <= bestPathLength) {
                     bestPathLength = tempPath.length;
                     path = tempPath;
@@ -226,7 +228,7 @@ function Main() {
 
         console.log(`path: ${path.join(', ')}`);
         const vertexCross = path.pop(); // Получить и удалить последнюю вершину из найденного пути
-        navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { moveStartV: 30, moveMaxV: 60, accelStartDist: 50, turnV: 60, Kp: 0.2, Kd: 0.5 });
+        navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { vStartMove: 30, vMaxMove: 60, accelStartDist: 50, vTurn: 60, Kp: 0.2, Kd: 0.5 });
 
         if ([1, 3, 5].indexOf(navigation.getCurrentPosition()) !== -1) { // Снизу
             navigation.directionSpinTurn(1, 70);
@@ -258,7 +260,7 @@ function Main() {
 
         navigation.setCurrentPosition(vertexCross); // Запись где мы были
 
-        if (c == 4) {
+        if (i == 4) {
             Manipulator(ManipulatorState.Down, true, 10); // Отпускаем манипулятор после определения цвета кубика
             pause(50);
             chassis.linearDistMove(50, 40, MotionBraking.Hold);
@@ -281,7 +283,7 @@ function Main() {
     })
     path = navigation.algorithmDFS(navigation.getCurrentPosition(), 15);
     console.log(`path: ${path.join(', ')}`);
-    navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { moveStartV: 30, moveMaxV: 60, accelStartDist: 50, turnV: 60, Kp: 0.2, Kd: 1 });
+    navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { vStartMove: 30, vMaxMove: 60, accelStartDist: 50, vTurn: 60, Kp: 0.2, Kd: 1 });
     navigation.directionSpinTurn(0, 60);
 
     for (let i = 0; i < 2; i++) {
@@ -313,33 +315,33 @@ function Main() {
     navigation.setCurrentPosition(17);
     navigation.setCurrentDirection(2);
 
-    for (let c = 6; c < 10; c++) {
+    for (let i = 6; i < 10; i++) {
         let bestPathLength = Infinity;
-        if (cubeColors[c] == 2) { // Синий
-            for (let i = 0; i < blueZoneCross.length; i++) {
+        if (cubeColors[i] == 2) { // Синий
+            for (let j = 0; j < blueZoneCross.length; j++) {
                 const currentPos = navigation.getCurrentPosition();
-                const tempPath = navigation.algorithmDFS(currentPos, blueZoneCross[i]);
-                console.log(`tempPath[${i}](B): ${tempPath.join(', ')}`);
+                const tempPath = navigation.algorithmDFS(currentPos, blueZoneCross[j]);
+                console.log(`tempPath[${j}](B): ${tempPath.join(', ')}`);
                 if (tempPath.length <= bestPathLength) {
                     bestPathLength = tempPath.length;
                     path = tempPath;
                 }
             }
-        } else if (cubeColors[c] == 3) { // Зелёный
-            for (let i = 0; i < greenZoneCross.length; i++) {
+        } else if (cubeColors[i] == 3) { // Зелёный
+            for (let j = 0; j < greenZoneCross.length; j++) {
                 const currentPos = navigation.getCurrentPosition();
-                const tempPath = navigation.algorithmDFS(currentPos, greenZoneCross[i]);
-                console.log(`tempPath[${i}](G): ${tempPath.join(', ')}`);
+                const tempPath = navigation.algorithmDFS(currentPos, greenZoneCross[j]);
+                console.log(`tempPath[${j}](G): ${tempPath.join(', ')}`);
                 if (tempPath.length <= bestPathLength) {
                     bestPathLength = tempPath.length;
                     path = tempPath;
                 }
             }
-        } else if (cubeColors[c] == 5) { // Красный
-            for (let i = 0; i < redZoneCross.length; i++) {
+        } else if (cubeColors[i] == 5) { // Красный
+            for (let j = 0; j < redZoneCross.length; j++) {
                 const currentPos = navigation.getCurrentPosition();
-                const tempPath = navigation.algorithmDFS(currentPos, redZoneCross[i]);
-                console.log(`tempPath[${i}](R): ${tempPath.join(', ')}`);
+                const tempPath = navigation.algorithmDFS(currentPos, redZoneCross[j]);
+                console.log(`tempPath[${j}](R): ${tempPath.join(', ')}`);
                 if (tempPath.length <= bestPathLength) {
                     bestPathLength = tempPath.length;
                     path = tempPath;
@@ -350,9 +352,9 @@ function Main() {
             brick.exitProgram();
         }
 
-        console.log(`path: ${path.join(', ')}`);
-        const vertexCross = path.pop(); // Получить и удалить последнюю вершину из найденного пути
-        navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { moveStartV: 30, moveMaxV: 60, accelStartDist: 50, turnV: 60, Kp: 0.2, Kd: 1 });
+        console.log(`path: ${path.join(', ')}`); // Записать в консоль путь
+        const targetIntersaction = path.pop(); // Получить и удалить последнюю вершину из найденного пути
+        navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { vStartMove: 30, vMaxMove: 60, accelStartDist: 50, vTurn: 60, Kp: 0.2, Kd: 1 });
 
         if ([1, 3, 5].indexOf(navigation.getCurrentPosition()) !== -1) { // Снизу
             navigation.directionSpinTurn(1, 70);
@@ -360,9 +362,8 @@ function Main() {
             navigation.directionSpinTurn(3, 70);
         }
 
-        if (vertexCross != navigation.getCurrentPosition()) {
-            motions.setLineFollowRefThreshold(70); // Повысить пороговое значение определения перекрёстка
-            // motions.lineFollowToCrossIntersection(AfterLineMotion.HoldStop, { v: 30, Kp: 0.2, Kd: 0.5 });
+        if (targetIntersaction != navigation.getCurrentPosition()) {
+            motions.setLineFollowRefThreshold(70); // Повысить пороговое значение определения перекрёстка цветной зоны
             motions.rampLineFollowToCrossIntersection(200, 50, 50, AfterLineMotion.HoldStop, { vStart: 30, vMax: 60, vFinish: 30, Kp: 0.2, Kd: 0.5 })
             motions.setLineFollowRefThreshold(40); // Установить стандартным пороговое значение определения перекрёстка
             pause(100);
@@ -382,7 +383,7 @@ function Main() {
         pause(50);
         UnloadingMechanism(UnloadingMechanismState.Up, true);
 
-        navigation.setCurrentPosition(vertexCross); // Запись где мы были
+        navigation.setCurrentPosition(targetIntersaction); // Запись где мы были
     }
 
     //// Едем домой
@@ -392,7 +393,7 @@ function Main() {
     } else if ([24, 22, 20].indexOf(navigation.getCurrentPosition()) !== -1) { // Сверху
         path = navigation.algorithmDFS(navigation.getCurrentPosition(), 28);
     }
-    navigation.followLineByPath(path, AfterLineMotion.Continue, { moveStartV: 30, moveMaxV: 60, accelStartDist: 50, turnV: 60, Kp: 0.2, Kd: 1 });
+    navigation.followLineByPath(path, AfterLineMotion.Continue, { vStartMove: 30, vMaxMove: 60, accelStartDist: 50, vTurn: 60, Kp: 0.2, Kd: 1 });
     chassis.decelFinishLinearDistMove(70, 30, 170, 100, AfterMotion.HoldStop); // Заезжаем в базу плавным замедлением
     music.playSoundEffectUntilDone(sounds.communicationGameOver); // Издаём звук завершения
 }
