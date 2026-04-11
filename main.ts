@@ -28,10 +28,10 @@ sensors.setHsvlToColorNumBoundariesHtColorSensor(htColorSensor, {
     yellowBoundary: 100, // H
     greenBoundary: 185, // H
     blueBoundary: 270, // H
-    purpleBoundary: -1
+    purpleBoundary: -1 // H
 }); // Установить границы преобразования hsvl в цветовые коды
 
-navigation.setNodesCount(29); // Количество узловых точек, используем не все
+navigation.setNodesCount(29); // Количество узловых точек
 navigation.buildGraph([
     { from: 0, to: 1, direction: NavDirection.RightLeft, weight: 7 },
     { from: 1, to: 2, direction: NavDirection.UpDown, weight: 2.8 },
@@ -101,7 +101,7 @@ const blueZoneCross: number[] = [6, 21, 14]; // Переменная для хр
 
 // Узнать цвет кубика и озвучить
 function GetCubeColor() {
-    const color = CheckHtColor(300, false); // Запрашиваем цвет
+    const color = CheckHtColor(200, false); // Запрашиваем цвет
     cubeColors.push(color); // Сохраняем цвет в массив
     const lastCubeIndex = cubeColors.length - 1; // Получить индекс последнего добавленного элемента cubeColors
     brick.printValue(`cubeColors${lastCubeIndex}`, cubeColors[lastCubeIndex], lastCubeIndex + 1); // Выводим на экран цвет N-го кубика
@@ -136,7 +136,7 @@ function Main() {
 
     navigation.directionSpinTurn(0, 60); // Поворачиваемся к первому ряду кубиков снизу
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 3; i++) { // Хватаем 3 ряда кубиков
         // Двигаемся к кубикам на расстояние по линии
         motions.rampLineFollowToDistanceByTwoSensors(170, 50, 50, MotionBraking.Hold, { vStart: 30, vMax: 60, vFinish: 30, Kp: 0.2, Kd: 0.5 });
 
@@ -166,10 +166,11 @@ function Main() {
         }
     }
 
+    // Устанавливаем где находимся и в какое направление повёрнуты
     navigation.setCurrentPosition(12);
     navigation.setCurrentDirection(2);
 
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 6; i++) { // Едем раскладывать 6 кубиков
         let bestPathLength = Infinity;
         if (cubeColors[i] == 2) { // Синий
             for (let j = 0; j < blueZoneCross.length; j++) {
@@ -207,30 +208,31 @@ function Main() {
         }
 
         console.log(`path: ${path.join(', ')}`);
-        const vertexCross = path.pop(); // Получить и удалить последнюю вершину из найденного пути
+        const targetIntersaction = path.pop(); // Получить и удалить последнюю вершину из найденного пути
         navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { vStartMove: 30, vMaxMove: 60, accelStartDist: 50, vTurn: 60, Kp: 0.2, Kd: 0.5 });
 
-        if ([1, 3, 5].indexOf(navigation.getCurrentPosition()) !== -1) { // Снизу
+        if ([1, 3, 5].indexOf(navigation.getCurrentPosition()) !== -1) { // Подъехали сверху
             navigation.directionSpinTurn(1, 70);
-        } else if ([24, 22, 20].indexOf(navigation.getCurrentPosition()) !== -1) { // Сверху
+        } else if ([24, 22, 20].indexOf(navigation.getCurrentPosition()) !== -1) { // Подъехали снизу
             navigation.directionSpinTurn(3, 70);
         }
 
-        if (vertexCross != navigation.getCurrentPosition()) {
+        // Если робот находится не на перекрёстке, до которого нужно доехать
+        if (targetIntersaction != navigation.getCurrentPosition()) {
             motions.setLineFollowRefThreshold(70); // Повысить пороговое значение определения перекрёстка
-            // motions.lineFollowToCrossIntersection(AfterLineMotion.HoldStop, { v: 30, Kp: 0.2, Kd: 0.5 });
-            motions.rampLineFollowToCrossIntersection(200, 50, 50, AfterLineMotion.HoldStop, { vStart: 30, vMax: 60, vFinish: 30, Kp: 0.2, Kd: 0.5 })
+            motions.rampLineFollowToCrossIntersection(200, 50, 50, AfterLineMotion.HoldStop, { vStart: 30, vMax: 60, vFinish: 30, Kp: 0.2, Kd: 0.5 }); // Двигаемся к цветной зоны
             motions.setLineFollowRefThreshold(40); // Установить стандартным пороговое значение определения перекрёстка
             pause(100);
-            chassis.linearDistMove(-50, 40, MotionBraking.Hold);
-            if (navigation.getCurrentDirection() == 1) {
-                navigation.directionSpinTurn(3, 60);
-            } else if (navigation.getCurrentDirection() == 3) {
-                navigation.directionSpinTurn(1, 60);
-            } else {
-                // chassis.spinTurn(180, 70);
-                navigation.directionSpinTurn(0, 60);
-            }
+            chassis.linearDistMove(-50, 40, MotionBraking.Hold); // Отъезжаем назад для последующего поворота, чтобы не заехать на цветные зоны
+            // if (navigation.getCurrentDirection() == 1) {
+            //     navigation.directionSpinTurn(3, 60);
+            // } else if (navigation.getCurrentDirection() == 3) {
+            //     navigation.directionSpinTurn(1, 60);
+            // } else {
+            //     // chassis.spinTurn(180, 70);
+            //     navigation.directionSpinTurn(0, 60);
+            // }
+            navigation.relativeSpinTurn(2, 70); // Повернуться в противоположном направлении (180 вправо) от цветной зоны, чтобы выгрузить кубик
         }
 
         // Выгрузка
@@ -238,17 +240,14 @@ function Main() {
         pause(50);
         UnloadingMechanism(UnloadingMechanismState.Up, true);
 
-        navigation.setCurrentPosition(vertexCross); // Запись где мы были
+        navigation.setCurrentPosition(targetIntersaction); // Записать на каком перекрёстке цветной зоны выгрузки были
 
-        if (i == 4) {
+        if (i == 4) { // Если всё выгрузили, то нужно кубик, который тащили в манипуляторе загрузить и распознать
             Manipulator(ManipulatorState.Down, true, 10); // Отпускаем манипулятор после определения цвета кубика
             pause(50);
-            chassis.linearDistMove(50, 40, MotionBraking.Hold);
-            Manipulator(ManipulatorState.Up, true, 60); // Поднимаем манипулятор после определения цвета кубика
-            cubeColors.push(CheckHtColor(300, false)); // Сохраняем цвет в массив
-            brick.printValue(`cubeColors${6}`, cubeColors[5], 6); // Выводим на экран цвет N-го кубика
-            VoiceColor(cubeColors[5]); // Озвучиваем цвет N-го кубика
-            chassis.linearDistMove(-50, 40, MotionBraking.Hold);
+            chassis.linearDistMove(50, 40, MotionBraking.Hold); // Подъезжаем к кубику вперёд, чтобы если он выпал чуть дальше, то захватить его
+            GetCubeColor(); // Узнать цвет поднятого кубика и озвучить
+            chassis.linearDistMove(-50, 40, MotionBraking.Hold); // Отъезжаем на место где были
             Manipulator(ManipulatorState.Down, true, 60); // Отпускаем манипулятор после определения цвета кубика
             control.runInParallel(function () {
                 pause(100);

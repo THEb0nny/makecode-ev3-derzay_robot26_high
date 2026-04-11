@@ -4,7 +4,7 @@
     "description": "",
     "dependencies": {
         "ev3": "*",
-        "promrobo21": "github:theb0nny/makecode-ev3-promrobo21#v8.11.0",
+        "promrobo21": "github:theb0nny/makecode-ev3-promrobo21#v8.12.0",
         "ht-color-sensor-v2": "github:theb0nny/makecode-ev3-hitechnic-color-sensor-v2#v3.0.0"
     },
     "files": [
