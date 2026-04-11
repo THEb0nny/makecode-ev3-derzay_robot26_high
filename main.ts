@@ -144,7 +144,7 @@ brick.buttonRight.onEvent(ButtonEvent.Pressed, function () {
     const color = CheckHtColor(2000, true);
     brick.clearScreen();
     brick.printValue("color", color, 1);
-    // VoiceColor(color);
+    VoiceColor(color);
     pause(500);
 });
 
@@ -260,7 +260,7 @@ function Main() {
     pause(50);
     Manipulator(ManipulatorState.Up, true, 60); // Отпускаем манипулятор после определения цвета кубика
     cubeColors.push(CheckHtColor(300, false)); // Сохраняем цвет в массив
-    brick.printValue(`cubeColors${6}`, cubeColors[6], 6); // Выводим на экран цвет N-го кубика
+    brick.printValue(`cubeColors${6}`, cubeColors[5], 6); // Выводим на экран цвет N-го кубика
     VoiceColor(cubeColors[5]); // Озвучиваем цвет N-го кубика
     Manipulator(ManipulatorState.Down, true, 60); // Отпускаем манипулятор после определения цвета кубика
     control.runInParallel(function () {
