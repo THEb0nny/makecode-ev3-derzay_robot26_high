@@ -67,14 +67,14 @@ navigation.buildGraph([
 // let btnLeftEventDone = false; // Переменная-флаг выполнения события нажатия на левую кнопку
 let btnRightEventDone = false; // Переменная-флаг выполнения события нажатия на правую кнопку
 
-// // Событие нажатия на левую кнопку
+// Событие нажатия на левую кнопку
 // brick.buttonLeft.onEvent(ButtonEvent.Pressed, function () {
 //     if (btnLeftEventDone) return;
 //     btnLeftEventDone = true;
-
+    
 //     // Чтобы найти мин и макс датчика цвета
-//     brick.clearScreen();
-//     sensors.searchRgbMinMax(colorSensor);
+//     // brick.clearScreen();
+//     // sensors.searchRgbMinMax(colorSensor);
 //     pause(500);
 // });
 
@@ -95,11 +95,11 @@ let cubeColors: number[] = []; // Массив, чтобы сохранить ц
 
 let path: number[] = []; // Переменная для хранения пути
 
-const baseIntersection = [0, 28]; // Номера перекрёстков, которые ведут на базу
+const baseIntersection = [0]; // Номера перекрёстков, которые ведут на базу
 const validColors = [2, 3, 5] // Цвета, с которыми мы работаем
-const redZoneIntersection = [2, 25, 27]; // Переменная для хранения перекрёстков с красной зоной
+const redZoneIntersection = [2, 25]; // Переменная для хранения перекрёстков с красной зоной
 const greenZoneIntersection = [4, 23]; // Переменная для хранения перекрёстков с зелёной зоной
-const blueZoneIntersection = [6, 21, 14]; // Переменная для хранения перекрёстков с синей зоной
+const blueZoneIntersection = [6, 21]; // Переменная для хранения перекрёстков с синей зоной
 
 // Узнать цвет кубика и озвучить
 function GetCubeColor() {
@@ -178,7 +178,7 @@ function Main() {
         // Если определился неправильный цвет, ищем первый нормальный цвет
         if (validColors.indexOf(color) == -1) {
             music.playSoundEffectUntilDone(sounds.informationError);
-            for (let j = 0; j < cubeColors.length; j++) {
+            for (let j = i; j < cubeColors.length; j++) { // Ищем в массиве, начиная от i-го, чтобы приехать в новую зону, а не в старую
                 if (validColors.indexOf(cubeColors[j]) != -1) {
                     color = cubeColors[j];
                     break;
@@ -209,11 +209,9 @@ function Main() {
         const targetIntersaction = path.pop(); // Получить и удалить последнюю вершину из найденного пути
         navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { vStartMove: 30, vMaxMove: 60, accelStartDist: 50, vTurn: 60, Kp: 0.2, Kd: 0.5 });
 
-        if ([1, 3, 5].indexOf(navigation.getCurrentPosition()) !== -1) { // Подъехали сверху
-            navigation.directionSpinTurn(1, 70);
-        } else if ([24, 22, 20].indexOf(navigation.getCurrentPosition()) !== -1) { // Подъехали снизу
-            navigation.directionSpinTurn(3, 70);
-        }
+        const newDir = navigation.getDirection(navigation.getCurrentPosition(), targetIntersaction);
+        console.log(`from ${navigation.getCurrentPosition()} to ${targetIntersaction} dir -> ${newDir}`);
+        navigation.directionSpinTurn(newDir, 70);
 
         // Если робот находится не на перекрёстке, до которого нужно доехать
         if (targetIntersaction != navigation.getCurrentPosition()) {
@@ -240,10 +238,8 @@ function Main() {
             GetCubeColor(); // Узнать цвет поднятого кубика и озвучить
             chassis.linearDistMove(-50, 40, MotionBraking.Hold); // Отъезжаем на место где были
             Manipulator(ManipulatorState.Down, true, 60); // Отпускаем манипулятор после определения цвета кубика, чтобы его отпустить на горку
-            control.runInParallel(function () {
-                pause(1000);
-                Manipulator(ManipulatorState.Up, true, 50); // Поднимаем манипулятор, чтобы он потом не задевал зону цветную
-            });
+            pause(100);
+            Manipulator(ManipulatorState.Up, true, 50); // Поднимаем манипулятор, чтобы он потом не задевал зону цветную
         }
     }
 
@@ -322,11 +318,9 @@ function Main() {
         const targetIntersaction = path.pop(); // Получить и удалить последнюю вершину из найденного пути
         navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { vStartMove: 30, vMaxMove: 60, accelStartDist: 50, vTurn: 60, Kp: 0.2, Kd: 1 });
 
-        if ([1, 3, 5].indexOf(navigation.getCurrentPosition()) !== -1) { // Снизу
-            navigation.directionSpinTurn(1, 70);
-        } else if ([24, 22, 20].indexOf(navigation.getCurrentPosition()) !== -1) { // Сверху
-            navigation.directionSpinTurn(3, 70);
-        }
+        const newDir = navigation.getDirection(navigation.getCurrentPosition(), targetIntersaction);
+        console.log(`from ${navigation.getCurrentPosition()} to ${targetIntersaction} dir -> ${newDir}`);
+        navigation.directionSpinTurn(newDir, 70);
 
         if (targetIntersaction != navigation.getCurrentPosition()) {
             motions.setLineFollowRefThreshold(70); // Повысить пороговое значение определения перекрёстка цветной зоны
@@ -345,13 +339,7 @@ function Main() {
         navigation.setCurrentPosition(targetIntersaction); // Запись где мы были
     }
 
-    //// Едем домой
-    // if ([1, 3, 5].indexOf(navigation.getCurrentPosition()) !== -1) { // Снизу
-    //     path = navigation.algorithmDFS(navigation.getCurrentPosition(), 0);
-    // } else if ([25, 23, 21].indexOf(navigation.getCurrentPosition()) !== -1) { // Сверху
-    //     path = navigation.algorithmDFS(navigation.getCurrentPosition(), 28);
-    // }
-    // let bestBasePathLength = Infinity;
+    /// Едем домой
     for (let i = 0, bestBasePathLength = Infinity; i < baseIntersection.length; i++) {
         const currentPos = navigation.getCurrentPosition();
         const tempBasePath = navigation.algorithmDFS(currentPos, baseIntersection[i]);
