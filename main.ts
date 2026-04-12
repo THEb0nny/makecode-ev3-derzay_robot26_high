@@ -119,7 +119,7 @@ function Main() {
     UnloadingMechanism(UnloadingMechanismState.Up, true, 10); // Предустановить механизм сброса в положение закрыт
     htColorSensor.setHz(60); // Установить частоту подстветки ht датчика цвета
 
-    brick.setStatusLight(StatusLight.GreenFlash); // Сигнал о готовности светодиодами
+    brick.setStatusLight(StatusLight.OrangeFlash); // Сигнал о готовности светодиодами
     brick.printString("RUN", 7, 13);
     brick.buttonEnter.pauseUntil(ButtonEvent.Pressed); // Ожидание нажатие кнопки
     brick.setStatusLight(StatusLight.Off); // Выключаем светодиоды
@@ -221,15 +221,7 @@ function Main() {
             motions.rampLineFollowToCrossIntersection(200, 50, 50, AfterLineMotion.HoldStop, { vStart: 30, vMax: 60, vFinish: 30, Kp: 0.2, Kd: 0.5 }); // Двигаемся к цветной зоны
             motions.setLineFollowRefThreshold(40); // Установить стандартным пороговое значение определения перекрёстка
             pause(100);
-            chassis.linearDistMove(-50, 40, MotionBraking.Hold); // Отъезжаем назад для последующего поворота, чтобы не заехать на цветные зоны
-            // if (navigation.getCurrentDirection() == 1) {
-            //     navigation.directionSpinTurn(3, 60);
-            // } else if (navigation.getCurrentDirection() == 3) {
-            //     navigation.directionSpinTurn(1, 60);
-            // } else {
-            //     // chassis.spinTurn(180, 70);
-            //     navigation.directionSpinTurn(0, 60);
-            // }
+            chassis.linearDistMove(-60, 40, MotionBraking.Hold); // Отъезжаем назад для последующего поворота, чтобы не заехать на цветные зоны
             navigation.relativeSpinTurn(2, 70); // Повернуться в противоположном направлении (180 вправо) от цветной зоны, чтобы выгрузить кубик
         }
 
@@ -244,12 +236,13 @@ function Main() {
             Manipulator(ManipulatorState.Down, true, 10); // Отпускаем манипулятор после определения цвета кубика
             pause(50);
             chassis.linearDistMove(50, 40, MotionBraking.Hold); // Подъезжаем к кубику вперёд, чтобы если он выпал чуть дальше, то захватить его
+            Manipulator(ManipulatorState.Up, true, 50); // Манипулятор поднять для захвата кубика
             GetCubeColor(); // Узнать цвет поднятого кубика и озвучить
             chassis.linearDistMove(-50, 40, MotionBraking.Hold); // Отъезжаем на место где были
-            Manipulator(ManipulatorState.Down, true, 60); // Отпускаем манипулятор после определения цвета кубика
+            Manipulator(ManipulatorState.Down, true, 60); // Отпускаем манипулятор после определения цвета кубика, чтобы его отпустить на горку
             control.runInParallel(function () {
-                pause(100);
-                Manipulator(ManipulatorState.Up, true, 50); // Поднимаем манипулятор
+                pause(1000);
+                Manipulator(ManipulatorState.Up, true, 50); // Поднимаем манипулятор, чтобы он потом не задевал зону цветную
             });
         }
     }
@@ -293,40 +286,36 @@ function Main() {
     navigation.setCurrentDirection(2);
 
     for (let i = 6; i < 10; i++) {
-        let bestPathLength = Infinity;
-        if (cubeColors[i] == 2) { // Синий
-            for (let j = 0; j < blueZoneIntersection.length; j++) {
-                const currentPos = navigation.getCurrentPosition();
-                const tempPath = navigation.algorithmDFS(currentPos, blueZoneIntersection[j]);
-                console.log(`tempPath[${j}](B): ${tempPath.join(', ')}`);
-                if (tempPath.length <= bestPathLength) {
-                    bestPathLength = tempPath.length;
-                    path = tempPath;
-                }
-            }
-        } else if (cubeColors[i] == 3) { // Зелёный
-            for (let j = 0; j < greenZoneIntersection.length; j++) {
-                const currentPos = navigation.getCurrentPosition();
-                const tempPath = navigation.algorithmDFS(currentPos, greenZoneIntersection[j]);
-                console.log(`tempPath[${j}](G): ${tempPath.join(', ')}`);
-                if (tempPath.length <= bestPathLength) {
-                    bestPathLength = tempPath.length;
-                    path = tempPath;
-                }
-            }
-        } else if (cubeColors[i] == 5) { // Красный
-            for (let j = 0; j < redZoneIntersection.length; j++) {
-                const currentPos = navigation.getCurrentPosition();
-                const tempPath = navigation.algorithmDFS(currentPos, redZoneIntersection[j]);
-                console.log(`tempPath[${j}](R): ${tempPath.join(', ')}`);
-                if (tempPath.length <= bestPathLength) {
-                    bestPathLength = tempPath.length;
-                    path = tempPath;
-                }
-            }
-        } else { // Какая-то жопа
+        let targetZones: number[] = []; // Целевая зона
+        let color = cubeColors[i]; // Цвет текущего кубика
+        // Если определился неправильный цвет, ищем первый нормальный цвет
+        if (validColors.indexOf(color) == -1) {
             music.playSoundEffectUntilDone(sounds.informationError);
-            brick.exitProgram();
+            for (let j = 0; j < cubeColors.length; j++) {
+                if (validColors.indexOf(cubeColors[j]) != -1) {
+                    color = cubeColors[j];
+                    break;
+                }
+            }
+        }
+        // Выбираем зону по цвету
+        if (color == 2) targetZones = blueZoneIntersection; // Синяя зона
+        else if (color == 3) targetZones = greenZoneIntersection; // Зелёная зона
+        else if (color == 5) targetZones = redZoneIntersection; // Красная зона
+        else {
+            music.playSoundEffectUntilDone(sounds.informationError);
+            brick.exitProgram(); // Вообще не нашли нормальный цвет
+        }
+
+        let bestPathLength = Infinity; // Вспомогательная переменная для определния самого короткого пути
+        for (let j = 0; j < targetZones.length; j++) {
+            const currentPos = navigation.getCurrentPosition(); // Получить текущую позицию
+            const tempPath = navigation.algorithmDFS(currentPos, targetZones[j]); // Путь от текущей позиции к i позиции цветной зоны
+            console.log(`tempPath[${j}](${cubeColors[i]}): ${tempPath.join(', ')}`); // Вывести в консоль
+            if (tempPath.length <= bestPathLength) { // Обновляем путь, если он короткий или равен прошлому
+                bestPathLength = tempPath.length;
+                path = tempPath;
+            }
         }
 
         console.log(`path: ${path.join(', ')}`); // Записать в консоль путь
@@ -344,15 +333,7 @@ function Main() {
             motions.rampLineFollowToCrossIntersection(200, 50, 50, AfterLineMotion.HoldStop, { vStart: 30, vMax: 60, vFinish: 30, Kp: 0.2, Kd: 0.5 })
             motions.setLineFollowRefThreshold(40); // Установить стандартным пороговое значение определения перекрёстка
             pause(100);
-            chassis.linearDistMove(-50, 40, MotionBraking.Hold);
-            // if (navigation.getCurrentDirection() == 1) {
-            //     navigation.directionSpinTurn(3, 60);
-            // } else if (navigation.getCurrentDirection() == 3) {
-            //     navigation.directionSpinTurn(1, 60);
-            // } else {
-            //     // chassis.spinTurn(180, 70);
-            //     navigation.directionSpinTurn(0, 60);
-            // }
+            chassis.linearDistMove(-60, 40, MotionBraking.Hold);
             navigation.relativeSpinTurn(2, 70); // Повернуться в противоположном направлении (180 вправо) от цветной зоны, чтобы выгрузить кубик
         }
 
@@ -380,7 +361,7 @@ function Main() {
             path = tempBasePath;
         }
     }
-    navigation.followLineByPath(path, AfterLineMotion.Continue, { vStartMove: 30, vMaxMove: 70, accelStartDist: 50, vTurn: 60, Kp: 0.2, Kd: 1 });
+    navigation.followLineByPath(path, AfterLineMotion.Continue, { vStartMove: 30, vMaxMove: 60, accelStartDist: 50, vTurn: 60, Kp: 0.3, Kd: 0.7 });
     chassis.decelFinishLinearDistMove(70, 30, 170, 100, AfterMotion.HoldStop); // Заезжаем в базу плавным замедлением
     music.playSoundEffectUntilDone(sounds.communicationGameOver); // Издаём звук завершения
 }
