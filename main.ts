@@ -134,7 +134,7 @@ function Main() {
     path = navigation.algorithmDFS(navigation.getCurrentPosition(), 8); // Расчитываем как доехать до вершины
     // console.log(`path: ${path.join(', ')}`);
     chassis.accelStartLinearDistMove(30, 50, 100, 50); // Плавный старт с стартовой зоны
-    navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { vStartMove: 50, vMaxMove: 70, accelStartDist: 50, vTurn: 60, Kp: 0.2, Kd: 1 });
+    navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { vStartMove: 50, vMaxMove: 80, accelStartDist: 50, vTurn: 60, Kp: 0.2, Kd: 1 });
 
     navigation.directionSpinTurn(0, 60); // Поворачиваемся к первому ряду кубиков снизу
 
@@ -146,9 +146,7 @@ function Main() {
         GetCubeColor(); // Узнать цвет поднятого кубика и озвучить
         Manipulator(ManipulatorState.Down, true, 60); // Отпускаем манипулятор после определения цвета кубика
 
-        // pause(50);
         chassis.linearDistMove(80, 40, MotionBraking.Hold); // Подъезжаем к дальнему кубику
-        // pause(50);
 
         if (i != 2) { // Если не второй ряд кубиков
             Manipulator(ManipulatorState.Up, true, 50); // Манипулятор поднять для захвата кубика
@@ -215,7 +213,7 @@ function Main() {
 
         // Если робот находится не на перекрёстке, до которого нужно доехать
         if (targetIntersaction != navigation.getCurrentPosition()) {
-            motions.setLineFollowRefThreshold(70); // Повысить пороговое значение определения перекрёстка
+            motions.setLineFollowRefThreshold(70); // Повысить пороговое значение определения перекрёстка цветовой зоны
             motions.rampLineFollowToCrossIntersection(200, 50, 50, AfterLineMotion.HoldStop, { vStart: 30, vMax: 60, vFinish: 30, Kp: 0.2, Kd: 0.5 }); // Двигаемся к цветной зоны
             motions.setLineFollowRefThreshold(40); // Установить стандартным пороговое значение определения перекрёстка
             pause(100);
@@ -259,9 +257,7 @@ function Main() {
         GetCubeColor(); // Узнать цвет кубика и озвучить
         Manipulator(ManipulatorState.Down, true, 60); // Отпускаем манипулятор после определения цвета кубика
 
-        // pause(50);
         chassis.linearDistMove(80, 40, MotionBraking.Hold); // Подъезжаем к дальнему кубику
-        // pause(50);
 
         Manipulator(ManipulatorState.Up, true, 50); // Манипулятор поднять для захвата дальнего кубика
         GetCubeColor(); // Узнать цвет кубика и озвучить
@@ -270,7 +266,7 @@ function Main() {
         chassis.spinTurn(180, 60); // Поворачиваем в противоположную сторону, чтобы выехать из зоны
         motions.rampLineFollowToCrossIntersection(200, 50, 50, AfterLineMotion.SmoothRolling, { vStart: 30, vMax: 50, vFinish: 40, Kp: 0.2, Kd: 0.5 });
 
-        if (i != 1) {  // Если i не первый, тогда двигаться к следующему ряду
+        if (i != 1) { // Если i не первый, тогда двигаться к следующему ряду
             chassis.spinTurn(90, 70);
             motions.lineFollowToCrossIntersection(AfterLineMotion.SmoothRolling, { v: 50, Kp: 0.2, Kd: 0.5 });
             chassis.spinTurn(90, 70);
@@ -324,7 +320,7 @@ function Main() {
 
         if (targetIntersaction != navigation.getCurrentPosition()) {
             motions.setLineFollowRefThreshold(70); // Повысить пороговое значение определения перекрёстка цветной зоны
-            motions.rampLineFollowToCrossIntersection(200, 50, 50, AfterLineMotion.HoldStop, { vStart: 30, vMax: 60, vFinish: 30, Kp: 0.2, Kd: 0.5 })
+            motions.rampLineFollowToCrossIntersection(200, 50, 50, AfterLineMotion.HoldStop, { vStart: 30, vMax: 60, vFinish: 30, Kp: 0.2, Kd: 0.5 });
             motions.setLineFollowRefThreshold(40); // Установить стандартным пороговое значение определения перекрёстка
             pause(100);
             chassis.linearDistMove(-60, 40, MotionBraking.Hold);
