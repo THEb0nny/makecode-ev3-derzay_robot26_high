@@ -136,7 +136,8 @@ function Main() {
     chassis.accelStartLinearDistMove(30, 50, 100, 50); // Плавный старт с стартовой зоны
     navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { vStartMove: 50, vMaxMove: 80, accelStartDist: 50, vTurn: 60, Kp: 0.2, Kd: 1 });
 
-    navigation.directionSpinTurn(0, 60); // Поворачиваемся к первому ряду кубиков снизу
+    // navigation.directionSpinTurn(0, 60); // Поворачиваемся к первому ряду кубиков снизу
+    navigation.directionRampSpinTurn(0, 30, 60);
 
     for (let i = 0; i < 3; i++) { // Хватаем 3 ряда кубиков
         // Двигаемся к кубикам на расстояние по линии
@@ -212,7 +213,8 @@ function Main() {
 
         const newDir = navigation.getDirection(navigation.getCurrentPosition(), targetIntersaction);
         console.log(`from ${navigation.getCurrentPosition()} to ${targetIntersaction} dir -> ${newDir}`);
-        navigation.directionSpinTurn(newDir, 70);
+        // navigation.directionSpinTurn(newDir, 70);
+        navigation.directionRampSpinTurn(newDir, 30, 70);
 
         // Если робот находится не на перекрёстке, до которого нужно доехать
         if (targetIntersaction != navigation.getCurrentPosition()) {
@@ -221,7 +223,8 @@ function Main() {
             motions.setLineFollowRefThreshold(40); // Установить стандартным пороговое значение определения перекрёстка
             pause(100);
             chassis.linearDistMove(-60, 40, MotionBraking.Hold); // Отъезжаем назад для последующего поворота, чтобы не заехать на цветные зоны
-            navigation.relativeSpinTurn(2, 70); // Повернуться в противоположном направлении (180 вправо) от цветной зоны, чтобы выгрузить кубик
+            // navigation.relativeSpinTurn(2, 70); // Повернуться в противоположном направлении (180 вправо) от цветной зоны, чтобы выгрузить кубик
+            navigation.relativeRampSpinTurn(2, 30, 70);
         }
 
         // Выгрузка
@@ -251,7 +254,8 @@ function Main() {
     path = navigation.algorithmDFS(navigation.getCurrentPosition(), 15);
     console.log(`path: ${path.join(', ')}`);
     navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { vStartMove: 30, vMaxMove: 60, accelStartDist: 50, vTurn: 60, Kp: 0.2, Kd: 1 }); // Двигаемся
-    navigation.directionSpinTurn(0, 60); // Поворачиваемся к кубикам
+    // navigation.directionSpinTurn(0, 60); // Поворачиваемся к кубикам
+    navigation.directionRampSpinTurn(0, 30, 70);
 
     for (let i = 0; i < 2; i++) { // Два ряда кубиков
         motions.rampLineFollowToDistanceByTwoSensors(170, 50, 50, MotionBraking.Hold, { vStart: 30, vMax: 60, vFinish: 30, Kp: 0.2, Kd: 0.5 });
@@ -322,7 +326,8 @@ function Main() {
 
         const newDir = navigation.getDirection(navigation.getCurrentPosition(), targetIntersaction);
         console.log(`from ${navigation.getCurrentPosition()} to ${targetIntersaction} dir -> ${newDir}`);
-        navigation.directionSpinTurn(newDir, 70);
+        // navigation.directionSpinTurn(newDir, 70);
+        navigation.directionRampSpinTurn(newDir, 30, 70);
 
         if (targetIntersaction != navigation.getCurrentPosition()) {
             motions.setLineFollowRefThreshold(70); // Повысить пороговое значение определения перекрёстка цветной зоны
@@ -330,7 +335,8 @@ function Main() {
             motions.setLineFollowRefThreshold(40); // Установить стандартным пороговое значение определения перекрёстка
             pause(100);
             chassis.linearDistMove(-60, 40, MotionBraking.Hold);
-            navigation.relativeSpinTurn(2, 70); // Повернуться в противоположном направлении (180 вправо) от цветной зоны, чтобы выгрузить кубик
+            // navigation.relativeSpinTurn(2, 70); // Повернуться в противоположном направлении (180 вправо) от цветной зоны, чтобы выгрузить кубик
+            navigation.relativeRampSpinTurn(2, 30, 70);
         }
 
         // Выгрузка
