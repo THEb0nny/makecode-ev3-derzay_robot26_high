@@ -360,6 +360,8 @@ function Main() {
     navigation.followLineByPath(path, AfterLineMotion.Continue, { vStartMove: 30, vMaxMove: 60, accelStartDist: 50, vTurn: 60, Kp: 0.3, Kd: 0.7 });
     chassis.decelFinishLinearDistMove(70, 30, 170, 100, AfterMotion.HoldStop); // Заезжаем в базу плавным замедлением
     music.playSoundEffectUntilDone(sounds.communicationGameOver); // Издаём звук завершения
+    pause(3000);
+    brick.exitProgram();
 }
 
 Main(); // Запуск главной функции
