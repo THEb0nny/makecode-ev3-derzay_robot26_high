@@ -156,13 +156,16 @@ function Main() {
             Manipulator(ManipulatorState.Up, true, 20); // Манипулятор поднять для захвата кубика
         }
 
-        chassis.spinTurn(180, 60); // Развернуться в противоположную сторону
+        // chassis.spinTurn(180, 60); // Развернуться в противоположную сторону
+        chassis.rampSpinTurn(180, 30, 70);
         motions.rampLineFollowToCrossIntersection(200, 50, 50, AfterLineMotion.SmoothRolling, { vStart: 30, vMax: 60, vFinish: 40, Kp: 0.2, Kd: 0.5 });
 
         if (i != 2) { // Если i не второй, тогда двигаться к следующему ряду
-            chassis.spinTurn(90, 70);
+            // chassis.spinTurn(90, 70);
+            chassis.rampSpinTurn(90, 30, 70);
             motions.lineFollowToCrossIntersection(AfterLineMotion.SmoothRolling, { v: 50, Kp: 0.2, Kd: 0.5 });
-            chassis.spinTurn(90, 70);
+            // chassis.spinTurn(90, 70);
+            chassis.rampSpinTurn(90, 30, 70);
         }
     }
 
@@ -263,13 +266,16 @@ function Main() {
         GetCubeColor(); // Узнать цвет кубика и озвучить
         Manipulator(ManipulatorState.Down, true, 60); // Отпускаем манипулятор после определения цвета кубика
 
-        chassis.spinTurn(180, 60); // Поворачиваем в противоположную сторону, чтобы выехать из зоны
+        // chassis.spinTurn(180, 60); // Поворачиваем в противоположную сторону, чтобы выехать из зоны
+        chassis.rampSpinTurn(180, 30, 70);
         motions.rampLineFollowToCrossIntersection(200, 50, 50, AfterLineMotion.SmoothRolling, { vStart: 30, vMax: 50, vFinish: 40, Kp: 0.2, Kd: 0.5 });
 
         if (i != 1) { // Если i не первый, тогда двигаться к следующему ряду
-            chassis.spinTurn(90, 70);
+            // chassis.spinTurn(90, 70);
+            chassis.rampSpinTurn(90, 30, 70);
             motions.lineFollowToCrossIntersection(AfterLineMotion.SmoothRolling, { v: 50, Kp: 0.2, Kd: 0.5 });
-            chassis.spinTurn(90, 70);
+            // chassis.spinTurn(90, 70);
+            chassis.rampSpinTurn(90, 30, 70);
         }
     }
 
