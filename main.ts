@@ -5,7 +5,7 @@ chassis.setBaseLength(180); // Установка расстония между 
 chassis.setBrakeSettleTime(150); // Время для стабилизации после торможения
 
 sensors.setNxtLightSensorsAsLineSensors(sensors.nxtLight1, sensors.nxtLight4); // Установка датчиков отражения в качестве датчиков линии
-sensors.setLineSensorsRawRefValues(2068, 1388, 2380, 1664); // Установка калибровочных значений отражения для нормализации отражения
+sensors.setLineSensorsRawRefValues(2096, 1360, 2388, 1664); // Установка калибровочных значений отражения для нормализации отражения
 
 motions.setDistRollingAfterIntersection(60); // Установка расстояния прокатки после опредления перекрёстка при движении по линии
 motions.setMinPwrAtEndMovement(30); // Установка минимальной скорости при завершении движений
@@ -71,7 +71,7 @@ let btnRightEventDone = false; // Переменная-флаг выполнен
 // brick.buttonLeft.onEvent(ButtonEvent.Pressed, function () {
 //     if (btnLeftEventDone) return;
 //     btnLeftEventDone = true;
-    
+
 //     // Чтобы найти мин и макс датчика цвета
 //     // brick.clearScreen();
 //     // sensors.searchRgbMinMax(colorSensor);
@@ -137,7 +137,6 @@ function Main() {
     navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { vStartMove: 50, vMaxMove: 80, accelStartDist: 50, vTurn: 60, Kp: 0.2, Kd: 1 });
 
     navigation.directionSpinTurn(0, 60); // Поворачиваемся к первому ряду кубиков снизу
-    // navigation.directionRampSpinTurn(0, 30, 60);
 
     for (let i = 0; i < 3; i++) { // Хватаем 3 ряда кубиков
         // Двигаемся к кубикам на расстояние по линии
@@ -158,15 +157,12 @@ function Main() {
         }
 
         chassis.spinTurn(180, 60); // Развернуться в противоположную сторону
-        // chassis.rampSpinTurn(180, 30, 70);
         motions.rampLineFollowToCrossIntersection(150, 50, 50, AfterLineMotion.SmoothRolling, { vStart: 30, vMax: 70, vFinish: 40, Kp: 0.2, Kd: 0.5 });
 
         if (i != 2) { // Если i не второй, тогда двигаться к следующему ряду
             chassis.spinTurn(90, 70);
-            // chassis.rampSpinTurn(90, 30, 70);
             motions.lineFollowToCrossIntersection(AfterLineMotion.SmoothRolling, { v: 50, Kp: 0.2, Kd: 0.5 });
             chassis.spinTurn(90, 70);
-            // chassis.rampSpinTurn(90, 30, 70);
         }
     }
 
@@ -214,7 +210,6 @@ function Main() {
         const newDir = navigation.getDirection(navigation.getCurrentPosition(), targetIntersaction);
         console.log(`from ${navigation.getCurrentPosition()} to ${targetIntersaction} dir -> ${newDir}`);
         navigation.directionSpinTurn(newDir, 70);
-        // navigation.directionRampSpinTurn(newDir, 30, 70);
 
         // Если робот находится не на перекрёстке, до которого нужно доехать
         if (targetIntersaction != navigation.getCurrentPosition()) {
@@ -224,8 +219,7 @@ function Main() {
             pause(100);
             chassis.linearDistMove(-60, 40, MotionBraking.Hold); // Отъезжаем назад для последующего поворота, чтобы не заехать на цветные зоны
             navigation.relativeSpinTurn(2, 70); // Повернуться в противоположном направлении (180 вправо) от цветной зоны, чтобы выгрузить кубик
-            // navigation.relativeRampSpinTurn(2, 30, 70);
-            control.runInParallel(function() {
+            control.runInParallel(function () {
                 levelings.linePositioning(300, { vMax: 50, Kp: 0.5 });
             });
         }
@@ -261,7 +255,6 @@ function Main() {
     console.log(`path: ${path.join(', ')}`);
     navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { vStartMove: 30, vMaxMove: 60, accelStartDist: 50, vTurn: 60, Kp: 0.2, Kd: 1 }); // Двигаемся
     navigation.directionSpinTurn(0, 60); // Поворачиваемся к кубикам
-    // navigation.directionRampSpinTurn(0, 30, 70);
 
     for (let i = 0; i < 2; i++) { // Два ряда кубиков
         motions.rampLineFollowToDistanceByTwoSensors(170, 50, 50, MotionBraking.Hold, { vStart: 30, vMax: 60, vFinish: 30, Kp: 0.2, Kd: 0.5 });
@@ -275,20 +268,19 @@ function Main() {
         Manipulator(ManipulatorState.Up, true, 50); // Манипулятор поднять для захвата дальнего кубика
         GetCubeColor(); // Узнать цвет кубика и озвучить
         Manipulator(ManipulatorState.Down, true, 60); // Отпускаем манипулятор после определения цвета кубика
-
         chassis.spinTurn(180, 60); // Поворачиваем в противоположную сторону, чтобы выехать из зоны
-        // chassis.rampSpinTurn(180, 30, 70);
         motions.rampLineFollowToCrossIntersection(150, 50, 50, AfterLineMotion.SmoothRolling, { vStart: 30, vMax: 70, vFinish: 40, Kp: 0.2, Kd: 0.5 });
 
         if (i != 1) { // Если i не первый, тогда двигаться к следующему ряду
             chassis.spinTurn(90, 70);
-            // chassis.rampSpinTurn(90, 30, 70);
             motions.lineFollowToCrossIntersection(AfterLineMotion.SmoothRolling, { v: 50, Kp: 0.2, Kd: 0.5 });
             chassis.spinTurn(90, 70);
-            // chassis.rampSpinTurn(90, 30, 70);
         }
     }
 
+    control.runInParallel(function () {
+        Manipulator(ManipulatorState.Up, true, 50);
+    });
     // Записываем где сейчас находимся и указываем текущее направление
     navigation.setCurrentPosition(17);
     navigation.setCurrentDirection(2);
@@ -332,8 +324,7 @@ function Main() {
 
         const newDir = navigation.getDirection(navigation.getCurrentPosition(), targetIntersaction);
         console.log(`from ${navigation.getCurrentPosition()} to ${targetIntersaction} dir -> ${newDir}`);
-        // navigation.directionSpinTurn(newDir, 70);
-        navigation.directionRampSpinTurn(newDir, 30, 70);
+        navigation.directionSpinTurn(newDir, 70);
 
         if (targetIntersaction != navigation.getCurrentPosition()) {
             motions.setLineFollowRefThreshold(70); // Повысить пороговое значение определения перекрёстка цветной зоны
@@ -342,7 +333,6 @@ function Main() {
             pause(100);
             chassis.linearDistMove(-60, 40, MotionBraking.Hold);
             navigation.relativeSpinTurn(2, 70); // Повернуться в противоположном направлении (180 вправо) от цветной зоны, чтобы выгрузить кубик
-            // navigation.relativeRampSpinTurn(2, 30, 70);
             control.runInParallel(function () {
                 levelings.linePositioning(300, { vMax: 50, Kp: 0.5 });
             });
