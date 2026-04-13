@@ -136,8 +136,8 @@ function Main() {
     chassis.accelStartLinearDistMove(30, 50, 100, 50); // Плавный старт с стартовой зоны
     navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { vStartMove: 50, vMaxMove: 80, accelStartDist: 50, vTurn: 60, Kp: 0.2, Kd: 1 });
 
-    // navigation.directionSpinTurn(0, 60); // Поворачиваемся к первому ряду кубиков снизу
-    navigation.directionRampSpinTurn(0, 30, 60);
+    navigation.directionSpinTurn(0, 60); // Поворачиваемся к первому ряду кубиков снизу
+    // navigation.directionRampSpinTurn(0, 30, 60);
 
     for (let i = 0; i < 3; i++) { // Хватаем 3 ряда кубиков
         // Двигаемся к кубикам на расстояние по линии
@@ -147,7 +147,7 @@ function Main() {
         GetCubeColor(); // Узнать цвет поднятого кубика и озвучить
         Manipulator(ManipulatorState.Down, true, 60); // Отпускаем манипулятор после определения цвета кубика
 
-        chassis.linearDistMove(80, 40, MotionBraking.Hold); // Подъезжаем к дальнему кубику
+        chassis.linearDistMove(70, 40, MotionBraking.Hold); // Подъезжаем к дальнему кубику
 
         if (i != 2) { // Если не второй ряд кубиков
             Manipulator(ManipulatorState.Up, true, 50); // Манипулятор поднять для захвата кубика
@@ -157,16 +157,16 @@ function Main() {
             Manipulator(ManipulatorState.Up, true, 20); // Манипулятор поднять для захвата кубика
         }
 
-        // chassis.spinTurn(180, 60); // Развернуться в противоположную сторону
-        chassis.rampSpinTurn(180, 30, 70);
-        motions.rampLineFollowToCrossIntersection(200, 50, 50, AfterLineMotion.SmoothRolling, { vStart: 30, vMax: 60, vFinish: 40, Kp: 0.2, Kd: 0.5 });
+        chassis.spinTurn(180, 60); // Развернуться в противоположную сторону
+        // chassis.rampSpinTurn(180, 30, 70);
+        motions.rampLineFollowToCrossIntersection(150, 50, 50, AfterLineMotion.SmoothRolling, { vStart: 30, vMax: 70, vFinish: 40, Kp: 0.2, Kd: 0.5 });
 
         if (i != 2) { // Если i не второй, тогда двигаться к следующему ряду
-            // chassis.spinTurn(90, 70);
-            chassis.rampSpinTurn(90, 30, 70);
+            chassis.spinTurn(90, 70);
+            // chassis.rampSpinTurn(90, 30, 70);
             motions.lineFollowToCrossIntersection(AfterLineMotion.SmoothRolling, { v: 50, Kp: 0.2, Kd: 0.5 });
-            // chassis.spinTurn(90, 70);
-            chassis.rampSpinTurn(90, 30, 70);
+            chassis.spinTurn(90, 70);
+            // chassis.rampSpinTurn(90, 30, 70);
         }
     }
 
@@ -213,8 +213,8 @@ function Main() {
 
         const newDir = navigation.getDirection(navigation.getCurrentPosition(), targetIntersaction);
         console.log(`from ${navigation.getCurrentPosition()} to ${targetIntersaction} dir -> ${newDir}`);
-        // navigation.directionSpinTurn(newDir, 70);
-        navigation.directionRampSpinTurn(newDir, 30, 70);
+        navigation.directionSpinTurn(newDir, 70);
+        // navigation.directionRampSpinTurn(newDir, 30, 70);
 
         // Если робот находится не на перекрёстке, до которого нужно доехать
         if (targetIntersaction != navigation.getCurrentPosition()) {
@@ -223,27 +223,33 @@ function Main() {
             motions.setLineFollowRefThreshold(40); // Установить стандартным пороговое значение определения перекрёстка
             pause(100);
             chassis.linearDistMove(-60, 40, MotionBraking.Hold); // Отъезжаем назад для последующего поворота, чтобы не заехать на цветные зоны
-            // navigation.relativeSpinTurn(2, 70); // Повернуться в противоположном направлении (180 вправо) от цветной зоны, чтобы выгрузить кубик
-            navigation.relativeRampSpinTurn(2, 30, 70);
+            navigation.relativeSpinTurn(2, 70); // Повернуться в противоположном направлении (180 вправо) от цветной зоны, чтобы выгрузить кубик
+            // navigation.relativeRampSpinTurn(2, 30, 70);
+            control.runInParallel(function() {
+                levelings.linePositioning(300, { vMax: 50, Kp: 0.5 });
+            });
         }
 
         // Выгрузка
         UnloadingMechanism(UnloadingMechanismState.Down, false, 20);
-        pause(50);
+        pause(10);
         UnloadingMechanism(UnloadingMechanismState.Up, true);
 
         navigation.setCurrentPosition(targetIntersaction); // Записать на каком перекрёстке цветной зоны выгрузки были
 
         if (i == 4) { // Если всё выгрузили, то нужно кубик, который тащили в манипуляторе загрузить и распознать
-            Manipulator(ManipulatorState.Down, true, 10); // Отпускаем манипулятор после определения цвета кубика
-            pause(50);
-            chassis.linearDistMove(50, 40, MotionBraking.Hold); // Подъезжаем к кубику вперёд, чтобы если он выпал чуть дальше, то захватить его
-            Manipulator(ManipulatorState.Up, true, 50); // Манипулятор поднять для захвата кубика
+            // Manipulator(ManipulatorState.Down, true, 10); // Отпускаем манипулятор после определения цвета кубика
+            // pause(50);
+            // chassis.linearDistMove(50, 40, MotionBraking.Hold); // Подъезжаем к кубику вперёд, чтобы если он выпал чуть дальше, то захватить его
+            // Manipulator(ManipulatorState.Up, true, 50); // Манипулятор поднять для захвата кубика
             GetCubeColor(); // Узнать цвет поднятого кубика и озвучить
-            chassis.linearDistMove(-50, 40, MotionBraking.Hold); // Отъезжаем на место где были
+            // chassis.linearDistMove(-60, 40, MotionBraking.Hold); // Отъезжаем на место где были
             Manipulator(ManipulatorState.Down, true, 60); // Отпускаем манипулятор после определения цвета кубика, чтобы его отпустить на горку
-            pause(100);
+            pause(10);
             Manipulator(ManipulatorState.Up, true, 50); // Поднимаем манипулятор, чтобы он потом не задевал зону цветную
+            control.runInParallel(function () {
+                levelings.linePositioning(300, { vMax: 50, Kp: 0.5 });
+            });
         }
     }
 
@@ -254,8 +260,8 @@ function Main() {
     path = navigation.algorithmDFS(navigation.getCurrentPosition(), 15);
     console.log(`path: ${path.join(', ')}`);
     navigation.followLineByPath(path, AfterLineMotion.SmoothRolling, { vStartMove: 30, vMaxMove: 60, accelStartDist: 50, vTurn: 60, Kp: 0.2, Kd: 1 }); // Двигаемся
-    // navigation.directionSpinTurn(0, 60); // Поворачиваемся к кубикам
-    navigation.directionRampSpinTurn(0, 30, 70);
+    navigation.directionSpinTurn(0, 60); // Поворачиваемся к кубикам
+    // navigation.directionRampSpinTurn(0, 30, 70);
 
     for (let i = 0; i < 2; i++) { // Два ряда кубиков
         motions.rampLineFollowToDistanceByTwoSensors(170, 50, 50, MotionBraking.Hold, { vStart: 30, vMax: 60, vFinish: 30, Kp: 0.2, Kd: 0.5 });
@@ -264,22 +270,22 @@ function Main() {
         GetCubeColor(); // Узнать цвет кубика и озвучить
         Manipulator(ManipulatorState.Down, true, 60); // Отпускаем манипулятор после определения цвета кубика
 
-        chassis.linearDistMove(80, 40, MotionBraking.Hold); // Подъезжаем к дальнему кубику
+        chassis.linearDistMove(70, 40, MotionBraking.Hold); // Подъезжаем к дальнему кубику
 
         Manipulator(ManipulatorState.Up, true, 50); // Манипулятор поднять для захвата дальнего кубика
         GetCubeColor(); // Узнать цвет кубика и озвучить
         Manipulator(ManipulatorState.Down, true, 60); // Отпускаем манипулятор после определения цвета кубика
 
-        // chassis.spinTurn(180, 60); // Поворачиваем в противоположную сторону, чтобы выехать из зоны
-        chassis.rampSpinTurn(180, 30, 70);
-        motions.rampLineFollowToCrossIntersection(200, 50, 50, AfterLineMotion.SmoothRolling, { vStart: 30, vMax: 50, vFinish: 40, Kp: 0.2, Kd: 0.5 });
+        chassis.spinTurn(180, 60); // Поворачиваем в противоположную сторону, чтобы выехать из зоны
+        // chassis.rampSpinTurn(180, 30, 70);
+        motions.rampLineFollowToCrossIntersection(150, 50, 50, AfterLineMotion.SmoothRolling, { vStart: 30, vMax: 70, vFinish: 40, Kp: 0.2, Kd: 0.5 });
 
         if (i != 1) { // Если i не первый, тогда двигаться к следующему ряду
-            // chassis.spinTurn(90, 70);
-            chassis.rampSpinTurn(90, 30, 70);
+            chassis.spinTurn(90, 70);
+            // chassis.rampSpinTurn(90, 30, 70);
             motions.lineFollowToCrossIntersection(AfterLineMotion.SmoothRolling, { v: 50, Kp: 0.2, Kd: 0.5 });
-            // chassis.spinTurn(90, 70);
-            chassis.rampSpinTurn(90, 30, 70);
+            chassis.spinTurn(90, 70);
+            // chassis.rampSpinTurn(90, 30, 70);
         }
     }
 
@@ -335,13 +341,16 @@ function Main() {
             motions.setLineFollowRefThreshold(40); // Установить стандартным пороговое значение определения перекрёстка
             pause(100);
             chassis.linearDistMove(-60, 40, MotionBraking.Hold);
-            // navigation.relativeSpinTurn(2, 70); // Повернуться в противоположном направлении (180 вправо) от цветной зоны, чтобы выгрузить кубик
-            navigation.relativeRampSpinTurn(2, 30, 70);
+            navigation.relativeSpinTurn(2, 70); // Повернуться в противоположном направлении (180 вправо) от цветной зоны, чтобы выгрузить кубик
+            // navigation.relativeRampSpinTurn(2, 30, 70);
+            control.runInParallel(function () {
+                levelings.linePositioning(300, { vMax: 50, Kp: 0.5 });
+            });
         }
 
         // Выгрузка
         UnloadingMechanism(UnloadingMechanismState.Down, false, 20);
-        pause(50);
+        pause(10);
         UnloadingMechanism(UnloadingMechanismState.Up, true);
 
         navigation.setCurrentPosition(targetIntersaction); // Запись где мы были
