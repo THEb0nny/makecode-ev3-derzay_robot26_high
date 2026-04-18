@@ -1,6 +1,6 @@
 {
     "name": "DR26_high",
-    "version": "2.2.3",
+    "version": "2.2.4",
     "description": "",
     "dependencies": {
         "ev3": "*",
