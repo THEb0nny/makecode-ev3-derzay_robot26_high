@@ -131,6 +131,18 @@ function FindBestPathToZones(targetZones: number[], color: number): number[] {
     return bestPath;
 }
 
+// Вспомогательная функция - получить целевые зоны по цвету кубика
+function GetTargetZonesByColor(color: number): number[] {
+    if (color == firstZoneColor) return firstZoneIntersection; // Первая зона
+    else if (color == secondZoneColor) return secondZoneIntersection; // Вторая зона
+    else if (color == thirdZoneColor) return thirdZoneIntersection; // Третья зона
+    else {
+        music.playSoundEffectUntilDone(sounds.informationError);
+        brick.exitProgram();
+        return [];
+    }
+}
+
 // Главная функция решения задачи
 function Main() {
     sensors.preparationLineSensor(); // Опрос датчиков линии
@@ -205,13 +217,7 @@ function Main() {
             }
         }
         // Выбираем зону по цвету
-        if (color == firstZoneColor) targetZones = firstZoneIntersection; // Красная зона
-        else if (color == secondZoneColor) targetZones = secondZoneIntersection; // Зелёная зона
-        else if (color == thirdZoneColor) targetZones = thirdZoneIntersection; // Синяя зона
-        else {
-            music.playSoundEffectUntilDone(sounds.informationError);
-            brick.exitProgram(); // Вообще не нашли нормальный цвет
-        }
+        targetZones = GetTargetZonesByColor(color);
 
         path = FindBestPathToZones(targetZones, color); // Найди из нескольких путей к зонам самый короткий путь
 
@@ -311,13 +317,7 @@ function Main() {
             }
         }
         // Выбираем зону по цвету
-        if (color == firstZoneColor) targetZones = firstZoneIntersection; // Красная зона
-        else if (color == secondZoneColor) targetZones = secondZoneIntersection; // Зелёная зона
-        else if (color == thirdZoneColor) targetZones = thirdZoneIntersection; // Синяя зона
-        else {
-            music.playSoundEffectUntilDone(sounds.informationError);
-            brick.exitProgram(); // Вообще не нашли нормальный цвет
-        }
+        targetZones = GetTargetZonesByColor(color);
 
         path = FindBestPathToZones(targetZones, color); // Найди из нескольких путей к зонам самый короткий путь
 
