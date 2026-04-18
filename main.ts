@@ -115,20 +115,33 @@ function GetCubeColor() {
     VoiceColor(cubeColors[lastCubeColorsIndex]); // Озвучиваем цвет кубика
 }
 
-// Вспомогательная функция нахождения наименьшего пути к цветовой зоне, к которой ведут разные вершины
-function FindBestPathToZones(targetZones: number[], color: number): number[] {
+// Вспомогательная функция нахождения наименьшего пути к зоне, к которой ведут разные вершины
+function FindBestPathToZones(targetZones: number[]): number[] {
     let bestPathLength = Infinity; // Длина самого короткого пути
-    let bestPath: number[] = [];   // Самый короткий путь
+    let bestPath: number[] = []; // Самый короткий путь
+    const currentPos = navigation.getCurrentPosition(); // Получить текущую позицию
     for (let j = 0; j < targetZones.length; j++) {
-        const currentPos = navigation.getCurrentPosition(); // Получить текущую позицию
         const tempPath = navigation.algorithmDFS(currentPos, targetZones[j]); // Путь до зоны
-        console.log(`tempPath[${j}](${color}): ${tempPath.join(', ')}`);
-        if (tempPath.length <= bestPathLength) {
+        console.log(`tempPath[${j}]: ${tempPath.join(', ')}`);
+        if (tempPath.length <= bestPathLength) { // ОБНОВИТЬ ЛУЧШИЙ ПУТЬ, ЕСЛИ ОН РАВЕН ПРЕДЫДУЩЕМУ ЛУЧШЕМУ ПУТИ, если не нужно обновить, то просто меньше!
             bestPathLength = tempPath.length;
             bestPath = tempPath;
         }
     }
     return bestPath;
+}
+
+// Вспомогательная функция - найти валидный цвет кубика начиная с индекса i
+function GetValidCubeColor(startIndex: number): number {
+    let color = cubeColors[startIndex];
+    if (validColors.indexOf(color) != -1) return color; // Нормальный цвет
+    music.playSoundEffectUntilDone(sounds.informationError);
+    for (let j = startIndex; j < cubeColors.length; j++) {
+        if (validColors.indexOf(cubeColors[j]) != -1) return cubeColors[j];
+    }
+    music.playSoundEffectUntilDone(sounds.informationError);
+    brick.exitProgram();
+    return 0; // Никогда не выполнится
 }
 
 // Вспомогательная функция - получить целевые зоны по цвету кубика
@@ -142,6 +155,7 @@ function GetTargetZonesByColor(color: number): number[] {
         return [];
     }
 }
+
 
 // Главная функция решения задачи
 function Main() {
@@ -204,22 +218,24 @@ function Main() {
     navigation.setCurrentDirection(2);
 
     for (let i = 0; i < 6; i++) { // Едем раскладывать 6 кубиков
-        let targetZones: number[] = []; // Целевая зона
-        let color = cubeColors[i]; // Цвет текущего кубика
-        // Если определился неправильный цвет, ищем первый нормальный цвет
-        if (validColors.indexOf(color) == -1) {
-            music.playSoundEffectUntilDone(sounds.informationError);
-            for (let j = i; j < cubeColors.length; j++) { // Ищем в массиве, начиная от i-го, чтобы приехать в новую зону, а не в старую
-                if (validColors.indexOf(cubeColors[j]) != -1) {
-                    color = cubeColors[j];
-                    break;
-                }
-            }
-        }
-        // Выбираем зону по цвету
-        targetZones = GetTargetZonesByColor(color);
+        let color = GetValidCubeColor(i); // Текущий валидный цвет кубика - НОВЫЙ ВАРИАНТ
+        // Старый вариант
+        // let color = cubeColors[i]; // Цвет текущего кубика
+        // // Если определился неправильный цвет, ищем первый нормальный цвет
+        // if (validColors.indexOf(color) == -1) {
+        //     music.playSoundEffectUntilDone(sounds.informationError);
+        //     for (let j = i; j < cubeColors.length; j++) { // Ищем в массиве, начиная от i-го, чтобы приехать в новую зону, а не в старую
+        //         if (validColors.indexOf(cubeColors[j]) != -1) {
+        //             color = cubeColors[j];
+        //             break;
+        //         }
+        //     }
+        // }
 
-        path = FindBestPathToZones(targetZones, color); // Найди из нескольких путей к зонам самый короткий путь
+        // Выбираем зону по цвету
+        let targetZones: number[] = GetTargetZonesByColor(color); // Целевая зона
+
+        path = FindBestPathToZones(targetZones); // Найди из нескольких путей к зонам самый короткий путь
 
         console.log(`path: ${path.join(', ')}`);
         const targetIntersaction = path.pop(); // Получить и удалить последнюю вершину из найденного пути
@@ -304,22 +320,24 @@ function Main() {
     navigation.setCurrentDirection(2);
 
     for (let i = 6; i < 10; i++) {
-        let targetZones: number[] = []; // Целевая зона
-        let color = cubeColors[i]; // Цвет текущего кубика
-        // Если определился неправильный цвет, ищем первый нормальный цвет
-        if (validColors.indexOf(color) == -1) {
-            music.playSoundEffectUntilDone(sounds.informationError);
-            for (let j = 0; j < cubeColors.length; j++) {
-                if (validColors.indexOf(cubeColors[j]) != -1) {
-                    color = cubeColors[j];
-                    break;
-                }
-            }
-        }
-        // Выбираем зону по цвету
-        targetZones = GetTargetZonesByColor(color);
+        let color = GetValidCubeColor(i); // Текущий валидный цвет кубика - НОВЫЙ ВАРИАНТ
+        // Старый вариант
+        // let color = cubeColors[i]; // Цвет текущего кубика
+        // // Если определился неправильный цвет, ищем первый нормальный цвет
+        // if (validColors.indexOf(color) == -1) {
+        //     music.playSoundEffectUntilDone(sounds.informationError);
+        //     for (let j = i; j < cubeColors.length; j++) { // Ищем в массиве, начиная от i-го, чтобы приехать в новую зону, а не в старую
+        //         if (validColors.indexOf(cubeColors[j]) != -1) {
+        //             color = cubeColors[j];
+        //             break;
+        //         }
+        //     }
+        // }
 
-        path = FindBestPathToZones(targetZones, color); // Найди из нескольких путей к зонам самый короткий путь
+        // Выбираем зону по цвету
+        let targetZones: number[] = GetTargetZonesByColor(color); // Целевая зона
+
+        path = FindBestPathToZones(targetZones); // Найди из нескольких путей к зонам самый короткий путь
 
         console.log(`path: ${path.join(', ')}`); // Записать в консоль путь
         const targetIntersaction = path.pop(); // Получить и удалить последнюю вершину из найденного пути
@@ -350,15 +368,17 @@ function Main() {
     }
 
     /// Едем домой
-    for (let i = 0, bestBasePathLength = Infinity; i < baseIntersection.length; i++) {
-        const currentPos = navigation.getCurrentPosition();
-        const tempBasePath = navigation.algorithmDFS(currentPos, baseIntersection[i]);
-        console.log(`tempBasePath[${i}]: ${tempBasePath.join(', ')}`);
-        if (tempBasePath.length <= bestBasePathLength) {
-            bestBasePathLength = tempBasePath.length;
-            path = tempBasePath;
-        }
-    }
+    path = FindBestPathToZones(baseIntersection); // Новый вариант
+    // Старый вариант
+    // for (let i = 0, bestBasePathLength = Infinity; i < baseIntersection.length; i++) {
+    //     const currentPos = navigation.getCurrentPosition();
+    //     const tempBasePath = navigation.algorithmDFS(currentPos, baseIntersection[i]);
+    //     console.log(`tempBasePath[${i}]: ${tempBasePath.join(', ')}`);
+    //     if (tempBasePath.length <= bestBasePathLength) {
+    //         bestBasePathLength = tempBasePath.length;
+    //         path = tempBasePath;
+    //     }
+    // }
     navigation.followLineByPath(path, AfterLineMotion.Continue, { vStartMove: 30, vMaxMove: 60, accelStartDist: 50, vTurn: 60, Kp: 0.3, Kd: 0.7 });
     chassis.decelFinishLinearDistMove(70, 30, 170, 100, AfterMotion.HoldStop); // Заезжаем в базу плавным замедлением
     music.playSoundEffectUntilDone(sounds.communicationGameOver); // Издаём звук завершения
