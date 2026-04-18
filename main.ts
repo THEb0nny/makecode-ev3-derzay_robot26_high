@@ -58,9 +58,9 @@ navigation.buildGraph([
     { from: 22, to: 23, direction: NavDirection.DownUp, weight: 2.8 },
     { from: 22, to: 24, direction: NavDirection.LeftRight, weight: 2 },
     { from: 24, to: 25, direction: NavDirection.DownUp, weight: 2.8 },
-    { from: 24, to: 26, direction: NavDirection.LeftRight, weight: 12 },
-    { from: 26, to: 27, direction: NavDirection.RightLeft, weight: 7.5 },
-    { from: 26, to: 28, direction: NavDirection.DownUp, weight: 3 },
+    // { from: 24, to: 26, direction: NavDirection.LeftRight, weight: 12 },
+    // { from: 26, to: 27, direction: NavDirection.RightLeft, weight: 7.5 },
+    // { from: 26, to: 28, direction: NavDirection.DownUp, weight: 3 },
 ]); // Строим матрицы смежности навигации по рёбрам
 
 
@@ -96,10 +96,15 @@ let cubeColors: number[] = []; // Массив, чтобы сохранить ц
 let path: number[] = []; // Переменная для хранения пути
 
 const baseIntersection = [0]; // Номера перекрёстков, которые ведут на базу
-const validColors = [2, 3, 5] // Цвета, с которыми мы работаем
-const redZoneIntersection = [2, 25]; // Переменная для хранения перекрёстков с красной зоной
-const greenZoneIntersection = [4, 23]; // Переменная для хранения перекрёстков с зелёной зоной
-const blueZoneIntersection = [6, 21]; // Переменная для хранения перекрёстков с синей зоной
+const firstZoneIntersection = [2, 25]; // Переменная для хранения перекрёстков с красной зоной
+const secondZoneIntersection = [4, 23]; // Переменная для хранения перекрёстков с зелёной зоной
+const thirdZoneIntersection = [6, 21]; // Переменная для хранения перекрёстков с синей зоной
+
+const firstZoneColor = 5; // Цвет первой зоны красный
+const secondZoneColor = 3; // Цвет второй зоны зелёный
+const thirdZoneColor = 2; // Цвет третей зоны синий
+
+const validColors = [firstZoneColor, secondZoneColor, thirdZoneColor] // Цвета, с которыми мы работаем
 
 // Узнать цвет кубика и озвучить
 function GetCubeColor() {
@@ -117,7 +122,7 @@ function Main() {
     unloadingMechanismMotor.setInverted(true); // Включить реверс мотора механизма сброса
     Manipulator(ManipulatorState.Down, true, 30); // Предустановить манипулятор в положение раскрытия
     UnloadingMechanism(UnloadingMechanismState.Up, true, 10); // Предустановить механизм сброса в положение закрыт
-    htColorSensor.setHz(60); // Установить частоту подстветки ht датчика цвета
+    htColorSensor.setHz(60); // Установить частоту подстветки ht датчика цвета!!!!!!!! В России 50!!!!!!!!
 
     brick.setStatusLight(StatusLight.OrangeFlash); // Сигнал о готовности светодиодами
     brick.printString("RUN", 7, 13);
@@ -184,9 +189,9 @@ function Main() {
             }
         }
         // Выбираем зону по цвету
-        if (color == 2) targetZones = blueZoneIntersection; // Синяя зона
-        else if (color == 3) targetZones = greenZoneIntersection; // Зелёная зона
-        else if (color == 5) targetZones = redZoneIntersection; // Красная зона
+        if (color == firstZoneColor) targetZones = firstZoneIntersection; // Красная зона
+        else if (color == secondZoneColor) targetZones = secondZoneIntersection; // Зелёная зона
+        else if (color == thirdZoneColor) targetZones = thirdZoneIntersection; // Синяя зона
         else {
             music.playSoundEffectUntilDone(sounds.informationError);
             brick.exitProgram(); // Вообще не нашли нормальный цвет
@@ -299,9 +304,9 @@ function Main() {
             }
         }
         // Выбираем зону по цвету
-        if (color == 2) targetZones = blueZoneIntersection; // Синяя зона
-        else if (color == 3) targetZones = greenZoneIntersection; // Зелёная зона
-        else if (color == 5) targetZones = redZoneIntersection; // Красная зона
+        if (color == firstZoneColor) targetZones = firstZoneIntersection; // Красная зона
+        else if (color == secondZoneColor) targetZones = secondZoneIntersection; // Зелёная зона
+        else if (color == thirdZoneColor) targetZones = thirdZoneIntersection; // Синяя зона
         else {
             music.playSoundEffectUntilDone(sounds.informationError);
             brick.exitProgram(); // Вообще не нашли нормальный цвет
