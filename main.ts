@@ -31,7 +31,7 @@ sensors.setHsvlToColorNumBoundariesHtColorSensor(htColorSensor, {
     purpleBoundary: -1 // H
 });
 
-navigation.setNodesCount(29); // Количество узловых точек
+navigation.setNodesCount(26); // Количество узловых точек
 navigation.buildGraph([
     { from: 0, to: 1, direction: NavDirection.RightLeft, weight: 7 },
     { from: 1, to: 2, direction: NavDirection.UpDown, weight: 2.8 },
@@ -113,6 +113,22 @@ function GetCubeColor() {
     const lastCubeColorsIndex = cubeColors.length - 1; // Получить индекс последнего добавленного элемента cubeColors
     brick.printValue(`cubeColors${lastCubeColorsIndex}`, cubeColors[lastCubeColorsIndex], lastCubeColorsIndex + 1); // Выводим на экран цвет кубика
     VoiceColor(cubeColors[lastCubeColorsIndex]); // Озвучиваем цвет кубика
+}
+
+// Вспомогательная функция нахождения наименьшего пути к цветовой зоне, к которой ведут разные вершины
+function FindBestPathToZones(targetZones: number[], color: number): number[] {
+    let bestPathLength = Infinity; // Длина самого короткого пути
+    let bestPath: number[] = [];   // Самый короткий путь
+    for (let j = 0; j < targetZones.length; j++) {
+        const currentPos = navigation.getCurrentPosition(); // Получить текущую позицию
+        const tempPath = navigation.algorithmDFS(currentPos, targetZones[j]); // Путь до зоны
+        console.log(`tempPath[${j}](${color}): ${tempPath.join(', ')}`);
+        if (tempPath.length <= bestPathLength) {
+            bestPathLength = tempPath.length;
+            bestPath = tempPath;
+        }
+    }
+    return bestPath;
 }
 
 // Главная функция решения задачи
@@ -197,16 +213,7 @@ function Main() {
             brick.exitProgram(); // Вообще не нашли нормальный цвет
         }
 
-        let bestPathLength = Infinity; // Вспомогательная переменная для определния самого короткого пути
-        for (let j = 0; j < targetZones.length; j++) {
-            const currentPos = navigation.getCurrentPosition(); // Получить текущую позицию
-            const tempPath = navigation.algorithmDFS(currentPos, targetZones[j]); // Путь от текущей позиции к i позиции цветной зоны
-            console.log(`tempPath[${j}](${cubeColors[i]}): ${tempPath.join(', ')}`); // Вывести в консоль
-            if (tempPath.length <= bestPathLength) { // Обновляем путь, если он короткий или равен прошлому
-                bestPathLength = tempPath.length;
-                path = tempPath;
-            }
-        }
+        path = FindBestPathToZones(targetZones, color); // Найди из нескольких путей к зонам самый короткий путь
 
         console.log(`path: ${path.join(', ')}`);
         const targetIntersaction = path.pop(); // Получить и удалить последнюю вершину из найденного пути
@@ -312,16 +319,7 @@ function Main() {
             brick.exitProgram(); // Вообще не нашли нормальный цвет
         }
 
-        let bestPathLength = Infinity; // Вспомогательная переменная для определния самого короткого пути
-        for (let j = 0; j < targetZones.length; j++) {
-            const currentPos = navigation.getCurrentPosition(); // Получить текущую позицию
-            const tempPath = navigation.algorithmDFS(currentPos, targetZones[j]); // Путь от текущей позиции к i позиции цветной зоны
-            console.log(`tempPath[${j}](${cubeColors[i]}): ${tempPath.join(', ')}`); // Вывести в консоль
-            if (tempPath.length <= bestPathLength) { // Обновляем путь, если он короткий или равен прошлому
-                bestPathLength = tempPath.length;
-                path = tempPath;
-            }
-        }
+        path = FindBestPathToZones(targetZones, color); // Найди из нескольких путей к зонам самый короткий путь
 
         console.log(`path: ${path.join(', ')}`); // Записать в консоль путь
         const targetIntersaction = path.pop(); // Получить и удалить последнюю вершину из найденного пути
